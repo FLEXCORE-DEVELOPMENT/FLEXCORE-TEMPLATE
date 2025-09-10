@@ -3,7 +3,7 @@
     "theme": "dark",
     "fontFamily": "inconsolata",
     "fontSize": "small",
-    "accentColor": "#ff3b30",
+    "accentColor": "#ff6b35",
     "titlebarButtonStyle": "square"
   },
   "behavior": {
