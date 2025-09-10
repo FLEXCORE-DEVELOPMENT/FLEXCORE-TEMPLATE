@@ -22,12 +22,13 @@ if (process.argv.includes('--dev')) {
 class MainWindow {
   constructor() {
     this.window = null;
+    this.splashWindow = null;
     this.tray = null;
     this.settingsPath = path.join(__dirname, '../config/settings.json');
     this.settings = this.loadSettings();
     this.globalShortcuts = new Map();
     this.isForceQuitting = false;
-    this.createWindow();
+    this.createSplashWindow();
     this.setupEventHandlers();
     this.registerGlobalShortcuts();
     this.setupAutoLaunch();
@@ -78,6 +79,47 @@ class MainWindow {
     } catch (err) {
       console.error('Error saving settings:', err);
     }
+  }
+
+  createSplashWindow() {
+    // Create splash screen window
+    this.splashWindow = new BrowserWindow({
+      width: 500,
+      height: 350,
+      frame: false,
+      alwaysOnTop: true,
+      resizable: false,
+      movable: false,
+      minimizable: false,
+      maximizable: false,
+      closable: false,
+      skipTaskbar: true,
+      transparent: true,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        enableRemoteModule: false,
+        preload: path.join(__dirname, '../preload/preload.js')
+      }
+    });
+
+    // Load splash screen HTML
+    this.splashWindow.loadFile(path.join(__dirname, '../renderer/splash.html'));
+
+    // Center the splash window
+    this.splashWindow.center();
+
+    // Show splash window when ready
+    this.splashWindow.once('ready-to-show', () => {
+      this.splashWindow.show();
+      
+      // Don't create main window yet - wait for splash completion
+    });
+
+    // Handle splash window closed
+    this.splashWindow.on('closed', () => {
+      this.splashWindow = null;
+    });
   }
 
   createWindow() {
@@ -155,6 +197,9 @@ class MainWindow {
     this.window.on('closed', () => {
       this.window = null;
     });
+
+    // Never show main window automatically - wait for splash completion
+    // The window will be shown by closeSplashAndShowMain() when splash finishes
 
     // Save window size and position when window is resized or moved (if remember window size is enabled)
     this.window.on('resize', () => {
@@ -312,6 +357,22 @@ class MainWindow {
       return this.settings;
     });
 
+    ipcMain.handle('save-settings', (event, newSettings) => {
+      this.settings = { ...this.settings, ...newSettings };
+      this.saveSettings();
+      return this.settings;
+    });
+
+    // Splash screen IPC handlers
+    ipcMain.handle('splash-complete', () => {
+      console.log('Received splash-complete signal');
+      // Add a small delay to ensure splash animations complete
+      setTimeout(() => {
+        this.closeSplashAndShowMain();
+      }, 100);
+    });
+
+    // Settings management handlers
     ipcMain.handle('save-setting', (event, key, value) => {
       const keys = key.split('.');
       let current = this.settings;
@@ -497,6 +558,39 @@ class MainWindow {
     ]);
 
     this.tray.setContextMenu(contextMenu);
+  }
+
+  closeSplashAndShowMain() {
+    console.log('closeSplashAndShowMain called');
+    
+    // Create main window now if it doesn't exist
+    if (!this.window) {
+      console.log('Creating main window');
+      this.createWindow();
+    }
+
+    // Close splash window
+    if (this.splashWindow && !this.splashWindow.isDestroyed()) {
+      console.log('Closing splash window');
+      this.splashWindow.hide();
+      this.splashWindow.destroy();
+      this.splashWindow = null;
+    }
+
+    // Show main window
+    if (this.window) {
+      console.log('Showing main window');
+      if (this.settings.behavior?.startMinimizedToTray) {
+        console.log('Starting minimized to tray');
+        this.createTray();
+      } else {
+        console.log('Showing and focusing main window');
+        this.window.show();
+        this.window.focus();
+      }
+    } else {
+      console.log('Main window not ready yet');
+    }
   }
 }
 

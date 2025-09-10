@@ -21,6 +21,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   restoreDefaultSettings: () => ipcRenderer.invoke('restore-default-settings'),
   exportSettings: () => ipcRenderer.invoke('export-settings'),
   updateGlobalShortcuts: () => ipcRenderer.invoke('update-global-shortcuts'),
+  
+  // Splash Screen
+  splashComplete: () => ipcRenderer.invoke('splash-complete'),
 });
 
 // Remove listeners

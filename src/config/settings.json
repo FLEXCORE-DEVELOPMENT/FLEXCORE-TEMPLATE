@@ -3,14 +3,14 @@
     "theme": "dark",
     "fontFamily": "inconsolata",
     "fontSize": "small",
-    "accentColor": "#28ca42",
+    "accentColor": "#ff3b30",
     "titlebarButtonStyle": "square"
   },
   "behavior": {
     "defaultWindowState": "normal",
     "rememberWindowSize": true,
     "launchOnStartup": false,
-    "startMinimizedToTray": true,
+    "startMinimizedToTray": false,
     "minimizeToTray": false,
     "closeToTray": true,
     "alwaysOnTop": false
