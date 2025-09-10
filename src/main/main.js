@@ -26,6 +26,7 @@ class MainWindow {
     this.settingsPath = path.join(__dirname, '../config/settings.json');
     this.settings = this.loadSettings();
     this.globalShortcuts = new Map();
+    this.isForceQuitting = false;
     this.createWindow();
     this.setupEventHandlers();
     this.registerGlobalShortcuts();
@@ -134,18 +135,18 @@ class MainWindow {
     // Handle window minimize event
     this.window.on('minimize', () => {
       if (this.settings.behavior?.minimizeToTray) {
-        // Create tray if it doesn't exist and hide window instead of minimizing
-        this.createTray();
+        // Ensure tray exists and hide window instead of minimizing
+        if (!this.tray) this.createTray();
         this.window.hide();
       }
     });
 
     // Handle window close event
     this.window.on('close', (event) => {
-      if (this.settings.behavior?.closeToTray) {
-        // Prevent the window from closing and hide it instead
+      if (this.settings.behavior?.closeToTray && !this.isForceQuitting) {
+        // Prevent the window from closing and hide it instead (unless force quitting from tray)
         event.preventDefault();
-        this.createTray();
+        if (!this.tray) this.createTray();
         this.window.hide();
       }
     });
@@ -241,6 +242,8 @@ class MainWindow {
         {
           label: 'Quit',
           click: () => {
+            // Set flag to indicate this is a forced quit from tray
+            this.isForceQuitting = true;
             app.quit();
           }
         }
@@ -269,8 +272,8 @@ class MainWindow {
     ipcMain.handle('window-minimize', () => {
       if (this.window) {
         if (this.settings.behavior?.minimizeToTray) {
-          // Create tray if it doesn't exist and hide window
-          this.createTray();
+          // Ensure tray exists and hide window
+          if (!this.tray) this.createTray();
           this.window.hide();
         } else {
           this.window.minimize();
@@ -291,8 +294,8 @@ class MainWindow {
     ipcMain.handle('window-close', () => {
       if (this.window) {
         if (this.settings.behavior?.closeToTray) {
-          // Create tray if it doesn't exist and hide window
-          this.createTray();
+          // Ensure tray exists and hide window
+          if (!this.tray) this.createTray();
           this.window.hide();
         } else {
           this.window.close();

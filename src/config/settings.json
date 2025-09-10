@@ -3,17 +3,17 @@
     "theme": "dark",
     "fontFamily": "inconsolata",
     "fontSize": "small",
-    "accentColor": "#ff3b30",
+    "accentColor": "#28ca42",
     "titlebarButtonStyle": "square"
   },
   "behavior": {
     "defaultWindowState": "normal",
     "rememberWindowSize": true,
-    "launchOnStartup": true,
+    "launchOnStartup": false,
     "startMinimizedToTray": true,
-    "minimizeToTray": true,
+    "minimizeToTray": false,
     "closeToTray": true,
-    "alwaysOnTop": true
+    "alwaysOnTop": false
   },
   "advanced": {
     "keyboardShortcuts": {
