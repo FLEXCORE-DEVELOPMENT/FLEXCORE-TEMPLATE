@@ -1,6 +1,188 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+// Page System
+.page {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  
+  &.hidden {
+    display: none;
+  }
+}
+
+// Config Page Styles
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $spacing-xl;
+  max-width: 900px;
+  width: 100%;
+}
+
+.config-section {
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  
+  h3 {
+    color: $text-primary;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    
+    i {
+      color: $accent-color;
+    }
+  }
+}
+
+.config-item {
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  label {
+    display: block;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    margin-bottom: $spacing-xs;
+    font-weight: 500;
+  }
+}
+
+.config-select {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  background: $primary-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  
+  &:focus {
+    outline: none;
+    border-color: $accent-color;
+  }
+}
+
+.config-color {
+  width: 60px;
+  height: 32px;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  background: transparent;
+  cursor: pointer;
+  
+  &:focus {
+    outline: 2px solid $accent-color;
+    outline-offset: 2px;
+  }
+}
+
+.config-checkbox {
+  margin-right: $spacing-sm;
+  accent-color: $accent-color;
+}
+
+// About Page Styles
+.about-content {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.about-section {
+  margin-bottom: $spacing-xxl;
+  
+  .app-logo {
+    font-size: 4rem;
+    color: $accent-color;
+    margin-bottom: $spacing-lg;
+    
+    i {
+      filter: drop-shadow(0 0 20px rgba(0, 162, 255, 0.3));
+    }
+  }
+  
+  h2 {
+    color: $text-primary;
+    font-size: $font-size-3xl;
+    font-weight: 300;
+    margin-bottom: $spacing-sm;
+  }
+  
+  .version {
+    color: $accent-color;
+    font-size: $font-size-lg;
+    font-weight: 500;
+    margin-bottom: $spacing-lg;
+  }
+  
+  .description {
+    color: $text-secondary;
+    font-size: $font-size-base;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
+    text-transform: none;
+  }
+}
+
+.about-details {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xxl;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  text-align: left;
+  
+  i {
+    color: $accent-color;
+    font-size: $font-size-lg;
+    width: 20px;
+  }
+  
+  div {
+    flex: 1;
+    
+    strong {
+      display: block;
+      color: $text-primary;
+      font-size: $font-size-sm;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    span {
+      color: $text-secondary;
+      font-size: $font-size-xs;
+    }
+  }
+}
+
+.about-footer {
+  color: $text-muted;
+  font-size: $font-size-xs;
+  
+  p {
+    margin: 0;
+  }
+}
+
 // Feature Grid and Cards
 .feature-grid {
   display: grid;

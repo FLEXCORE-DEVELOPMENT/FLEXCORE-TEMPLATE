@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' https://unpkg.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://ka-f.fontawesome.com; font-src 'self' https://fonts.gstatic.com https://ka-f.fontawesome.com; script-src 'self' https://kit.fontawesome.com; connect-src 'self' https://ka-f.fontawesome.com;">
     <title>FlexCore App</title>
     <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://kit.fontawesome.com/b7b0f6bc3b.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
@@ -15,6 +15,11 @@
 <body>
     <!-- Custom Titlebar -->
     <div class="titlebar">
+        <div class="titlebar-left">
+            <button class="menu-button" id="menu-btn" title="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
         <div class="titlebar-drag-region">
             <div class="titlebar-content">
                 <div class="titlebar-title">
@@ -23,67 +28,215 @@
             </div>
         </div>
         <div class="titlebar-controls">
-            <button class="mac-button close-button" id="close-btn" title="Close">
-                <div class="button-dot"></div>
-            </button>
             <button class="mac-button minimize-button" id="minimize-btn" title="Minimize">
                 <div class="button-dot"></div>
             </button>
             <button class="mac-button maximize-button" id="maximize-btn" title="Maximize">
                 <div class="button-dot"></div>
             </button>
+            <button class="mac-button close-button" id="close-btn" title="Close">
+                <div class="button-dot"></div>
+            </button>
         </div>
     </div>
+
+    <!-- Slide-out Menu -->
+    <div class="slide-menu" id="slide-menu">
+        <div class="menu-header">
+            <h3>Menu</h3>
+            <button class="menu-close" id="menu-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="menu-nav">
+            <ul class="menu-list menu-list-top">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="menu-list menu-list-bottom">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menu-overlay"></div>
 
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="container">
-            <header class="app-header">
-                <h1 class="app-title">
-                    FLEXCORE
-                </h1>
-                <p class="app-subtitle">Modern Electron Application</p>
-            </header>
+            <!-- Home Page -->
+            <div class="page" id="home-page">
+                <header class="app-header">
+                    <h1 class="app-title">
+                        FLEXCORE
+                    </h1>
+                    <p class="app-subtitle">Modern Electron Application</p>
+                </header>
 
-            <main class="content-area">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <div class="icon-placeholder"></div>
+                <main class="content-area">
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <h3>Modern UI</h3>
+                            <p>Clean and modern interface with custom titlebar</p>
                         </div>
-                        <h3>Modern UI</h3>
-                        <p>Clean and modern interface with custom titlebar</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <div class="icon-placeholder"></div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Secure</h3>
+                            <p>Built with Electron security best practices</p>
                         </div>
-                        <h3>Secure</h3>
-                        <p>Built with Electron security best practices</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <div class="icon-placeholder"></div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <h3>Cross-Platform</h3>
+                            <p>Works on Windows, macOS, and Linux</p>
                         </div>
-                        <h3>Cross-Platform</h3>
-                        <p>Works on Windows, macOS, and Linux</p>
                     </div>
-                </div>
+                </main>
+            </div>
 
-                <div class="action-buttons">
-                    <button class="primary-button">Get Started</button>
-                    <button class="secondary-button">Learn More</button>
-                </div>
-            </main>
+            <!-- Settings Page -->
+            <div class="page hidden" id="config-page">
+                <header class="app-header">
+                    <h1 class="app-title">
+                        <i class="fas fa-cog"></i> Settings
+                    </h1>
+                    <p class="app-subtitle">Customize your application settings</p>
+                </header>
+
+                <main class="content-area">
+                    <div class="config-grid">
+                        <div class="config-section">
+                            <h3><i class="fas fa-paint-brush"></i> Appearance</h3>
+                            <div class="config-item">
+                                <label>Theme</label>
+                                <select class="config-select">
+                                    <option value="dark">Dark</option>
+                                    <option value="light">Light</option>
+                                    <option value="auto">Auto</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>Accent Color</label>
+                                <input type="color" class="config-color" value="#00a2ff">
+                            </div>
+                        </div>
+
+                        <div class="config-section">
+                            <h3><i class="fas fa-window-maximize"></i> Window</h3>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox" checked>
+                                    Remember window size
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox">
+                                    Start minimized
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="config-section">
+                            <h3><i class="fas fa-bell"></i> Notifications</h3>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox" checked>
+                                    Enable notifications
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox">
+                                    Sound notifications
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <!-- About Page -->
+            <div class="page hidden" id="about-page">
+                <header class="app-header">
+                    <h1 class="app-title">
+                        <i class="fas fa-info-circle"></i> About FlexCore
+                    </h1>
+                    <p class="app-subtitle">Application Information</p>
+                </header>
+
+                <main class="content-area">
+                    <div class="about-content">
+                        <div class="about-section">
+                            <div class="app-logo">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <h2>FlexCore Template</h2>
+                            <p class="version">Version 1.0.0</p>
+                            <p class="description">
+                                A modern Electron application template featuring a custom titlebar, 
+                                secure architecture, and beautiful UI components. Built with the latest 
+                                web technologies and best practices.
+                            </p>
+                        </div>
+
+                        <div class="about-details">
+                            <div class="detail-item">
+                                <i class="fas fa-code"></i>
+                                <div>
+                                    <strong>Built with</strong>
+                                    <span>Electron, HTML5, CSS3, JavaScript</span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>
+                                    <strong>Security</strong>
+                                    <span>Context isolation, CSP enabled</span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-desktop"></i>
+                                <div>
+                                    <strong>Platform</strong>
+                                    <span>Windows, macOS, Linux</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-footer">
+                            <p>&copy; 2025 FlexCore Development. All rights reserved.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
         </div>
     </div>
 
     <script src="renderer.js"></script>
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-    </script>
 </body>
 </html>

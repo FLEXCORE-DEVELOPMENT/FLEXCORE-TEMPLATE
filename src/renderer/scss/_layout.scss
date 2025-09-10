@@ -6,22 +6,23 @@
   height: calc(100vh - #{$titlebar-height});
   overflow-y: auto;
   padding: 0;
-  @include custom-scrollbar;
 }
 
 .container {
   max-width: $container-max-width;
   margin: 0 auto;
-  padding: $spacing-xxl $spacing-lg;
+  padding: $spacing-lg;
   height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 // Header Styles
 .app-header {
   text-align: center;
-  margin-bottom: $spacing-xxxl;
+  margin-bottom: $spacing-xl;
 }
 
 .app-title {
@@ -40,13 +41,14 @@
   font-size: $font-size-xl;
   color: $text-muted;
   font-weight: 300;
+  margin-bottom: $spacing-xxl;
 }
 
 // Content Area
 .content-area {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }

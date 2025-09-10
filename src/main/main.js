@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
 const path = require('path');
 
 // Enable live reload for development
@@ -21,7 +21,9 @@ if (process.argv.includes('--dev')) {
 class MainWindow {
   constructor() {
     this.window = null;
+    this.tray = null;
     this.createWindow();
+    this.createTray();
     this.setupEventHandlers();
   }
 
@@ -71,7 +73,7 @@ class MainWindow {
   }
 
   setupEventHandlers() {
-    // Handle window controls from renderer process
+    // IPC handlers for window controls
     ipcMain.handle('window-minimize', () => {
       if (this.window) {
         this.window.minimize();
@@ -108,6 +110,102 @@ class MainWindow {
         this.window.webContents.send('window-unmaximized');
       });
     }
+  }
+
+  createTray() {
+    // Create tray icon
+    const trayIconPath = path.join(__dirname, '../../assets/favicon.ico');
+    this.tray = new Tray(trayIconPath);
+    
+    // Set initial tray menu
+    this.updateTrayMenu();
+
+    // Set tray properties with enhanced styling
+    this.tray.setToolTip('FlexCore Application - Double-click to toggle, Right-click for menu');
+    
+    // Platform-specific tray enhancements
+    if (process.platform === 'win32') {
+      // Windows-specific tray styling
+      this.tray.setIgnoreDoubleClickEvents(false);
+    } else if (process.platform === 'darwin') {
+      // macOS-specific tray styling
+      this.tray.setPressedImage(trayIconPath);
+    }
+    
+    // Handle tray double-click (show/hide window)
+    this.tray.on('double-click', () => {
+      if (this.window.isVisible()) {
+        this.window.hide();
+      } else {
+        this.window.show();
+        this.window.focus();
+      }
+      // Update menu after visibility change
+      setTimeout(() => this.updateTrayMenu(), 100);
+    });
+  }
+
+  updateTrayMenu() {
+    const isVisible = this.window && this.window.isVisible();
+    
+    // Create dynamic context menu based on window visibility
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'FLEXCORE TEMPLATE',
+        enabled: false,
+        type: 'normal'
+      },
+      { type: 'separator' },
+      {
+        label: 'SETTINGS',
+        accelerator: 'CmdOrCtrl+,',
+        click: () => {
+          this.window.show();
+          this.window.focus();
+          this.window.webContents.send('navigate-to-page', 'config');
+          setTimeout(() => this.updateTrayMenu(), 100);
+        }
+      },
+      {
+        label: 'ABOUT',
+        accelerator: 'CmdOrCtrl+I',
+        click: () => {
+          this.window.show();
+          this.window.focus();
+          this.window.webContents.send('navigate-to-page', 'about');
+          setTimeout(() => this.updateTrayMenu(), 100);
+        }
+      },
+      { type: 'separator' },
+      // Show 'Show' only when window is hidden
+      ...(isVisible ? [] : [{
+        label: 'SHOW',
+        accelerator: 'CmdOrCtrl+Shift+S',
+        click: () => {
+          this.window.show();
+          this.window.focus();
+          setTimeout(() => this.updateTrayMenu(), 100);
+        }
+      }]),
+      // Show 'Hide' only when window is visible
+      ...(isVisible ? [{
+        label: 'HIDE',
+        accelerator: 'CmdOrCtrl+Shift+H',
+        click: () => {
+          this.window.hide();
+          setTimeout(() => this.updateTrayMenu(), 100);
+        }
+      }] : []),
+      {
+        label: 'CLOSE',
+        accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
+        click: () => {
+          app.quit();
+        }
+      }
+    ]);
+
+    this.tray.setContextMenu(contextMenu);
   }
 }
 

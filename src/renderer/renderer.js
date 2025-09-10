@@ -10,6 +10,8 @@ class AppRenderer {
         this.setupWindowControls();
         this.setupWindowStateListeners();
         this.setupAppInteractions();
+        this.setupMenuControls();
+        this.setupTrayNavigation();
         await this.updateMaximizeButton();
     }
 
@@ -92,19 +94,6 @@ class AppRenderer {
     }
 
     setupAppInteractions() {
-        // Get action buttons
-        const primaryBtn = document.querySelector('.primary-button');
-        const secondaryBtn = document.querySelector('.secondary-button');
-
-        // Add click handlers for demo purposes
-        primaryBtn.addEventListener('click', () => {
-            this.showNotification('Get Started clicked!', 'primary');
-        });
-
-        secondaryBtn.addEventListener('click', () => {
-            this.showNotification('Learn More clicked!', 'secondary');
-        });
-
         // Add feature card interactions
         this.setupFeatureCards();
     }
@@ -113,11 +102,6 @@ class AppRenderer {
         const featureCards = document.querySelectorAll('.feature-card');
         
         featureCards.forEach((card, index) => {
-            card.addEventListener('click', () => {
-                const title = card.querySelector('h3').textContent;
-                this.showNotification(`${title} feature selected!`, 'info');
-            });
-
             // Add subtle animation on load
             setTimeout(() => {
                 card.style.opacity = '1';
@@ -198,6 +182,86 @@ class AppRenderer {
                 event.preventDefault();
                 window.electronAPI.closeWindow();
             }
+        });
+    }
+
+    setupMenuControls() {
+        const menuBtn = document.getElementById('menu-btn');
+        const slideMenu = document.getElementById('slide-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const menuClose = document.getElementById('menu-close');
+
+        // Open menu
+        menuBtn.addEventListener('click', () => {
+            slideMenu.classList.add('open');
+            menuOverlay.classList.add('active');
+        });
+
+        // Close menu via close button
+        menuClose.addEventListener('click', () => {
+            slideMenu.classList.remove('open');
+            menuOverlay.classList.remove('active');
+        });
+
+        // Close menu via overlay click
+        menuOverlay.addEventListener('click', () => {
+            slideMenu.classList.remove('open');
+            menuOverlay.classList.remove('active');
+        });
+
+        // Close menu with Escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && slideMenu.classList.contains('open')) {
+                slideMenu.classList.remove('open');
+                menuOverlay.classList.remove('active');
+            }
+        });
+
+        // Handle menu item clicks
+        const menuLinks = document.querySelectorAll('.menu-link');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const text = link.querySelector('span').textContent.toLowerCase();
+                this.navigateToPage(text);
+                
+                // Close menu after selection
+                slideMenu.classList.remove('open');
+                menuOverlay.classList.remove('active');
+            });
+        });
+    }
+
+    navigateToPage(pageName) {
+        // Hide all pages
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => {
+            page.classList.add('hidden');
+        });
+
+        // Show selected page (handle settings -> config mapping)
+        const pageId = pageName === 'settings' ? 'config' : pageName;
+        const targetPage = document.getElementById(`${pageId}-page`);
+        if (targetPage) {
+            targetPage.classList.remove('hidden');
+        }
+
+        // Update active menu item
+        const menuLinks = document.querySelectorAll('.menu-link');
+        menuLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        const activeLink = document.querySelector(`.menu-link span:contains('${pageName.charAt(0).toUpperCase() + pageName.slice(1)}')`);
+        if (activeLink) {
+            activeLink.closest('.menu-link').classList.add('active');
+        }
+    }
+
+    setupTrayNavigation() {
+        // Listen for tray navigation messages from main process
+        window.electronAPI.onNavigateToPage((pageName) => {
+            this.navigateToPage(pageName);
         });
     }
 }

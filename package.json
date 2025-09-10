@@ -24,10 +24,6 @@
   "author": "FlexCore Development",
   "license": "MIT",
 
-  "dependencies": {
-    "lucide": "^0.542.0"
-  },
-
   "devDependencies": {
     "electron": "^39.0.0-alpha.2",
     "electron-builder": "^26.0.20",

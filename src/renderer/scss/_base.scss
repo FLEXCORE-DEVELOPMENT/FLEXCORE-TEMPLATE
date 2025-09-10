@@ -1,7 +1,6 @@
 @use 'variables' as *;
-@use 'mixins' as *;
 
-// Reset and Base Styles
+// CSS Reset and Base Styles
 * {
   margin: 0;
   padding: 0;
@@ -10,12 +9,13 @@
 
 body {
   font-family: $font-family;
-  @include gradient-bg;
+  background: $primary-bg;
   color: $text-primary;
-  overflow: hidden;
   height: 100vh;
-  user-select: none;
-  @include custom-scrollbar;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-transform: uppercase;
 }
 
 // Keyframes

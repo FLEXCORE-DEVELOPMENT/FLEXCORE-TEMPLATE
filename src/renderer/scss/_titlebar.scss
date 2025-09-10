@@ -11,6 +11,12 @@
   z-index: $z-titlebar;
 }
 
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
 .titlebar-drag-region {
   flex: 1;
   -webkit-app-region: drag;
@@ -122,5 +128,186 @@
   &:hover .button-dot {
     background: #30d158;
     box-shadow: 0 0 12px rgba(48, 209, 88, 0.4);
+  }
+}
+
+// Menu button styles
+.menu-button {
+  width: 32px;
+  height: $titlebar-height;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  cursor: pointer;
+  font-family: $font-family;
+  @include flex-center;
+  transition: all $transition-fast;
+  font-size: 14px;
+  
+  i {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $accent-color;
+    
+    i {
+      transform: rotate(90deg) scale(1.1);
+    }
+  }
+  
+  &:active {
+    i {
+      transform: rotate(90deg) scale(0.95);
+    }
+  }
+  
+  &:focus {
+    outline: 1px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+}
+
+// Slide-out menu styles
+.slide-menu {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100vh;
+  background: $card-bg;
+  border-right: 1px solid $border-color;
+  z-index: 2000;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &.open {
+    left: 0;
+  }
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-color;
+  
+  h3 {
+    margin: 0;
+    color: $text-primary;
+    font-size: $font-size-lg;
+    font-weight: 600;
+  }
+}
+
+.menu-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  cursor: pointer;
+  @include flex-center;
+  border-radius: $border-radius-sm;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $text-primary;
+  }
+}
+
+.menu-nav {
+  padding: $spacing-sm 0;
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-list-top {
+  flex: 0 0 auto;
+}
+
+.menu-list-bottom {
+  flex: 0 0 auto;
+  border-top: 1px solid $border-color;
+  padding-top: $spacing-sm;
+}
+
+.menu-item {
+  margin: 0;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  color: $text-secondary;
+  text-decoration: none;
+  transition: all $transition-fast;
+  font-size: $font-size-base;
+  position: relative;
+  
+  i {
+    width: 16px;
+    font-size: 14px;
+    color: $accent-color;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  span {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  &:hover {
+    background: rgba(0, 162, 255, 0.1);
+    color: $text-primary;
+    transform: translateX(8px);
+    
+    i {
+      color: $accent-light;
+      transform: scale(1.2) rotate(5deg);
+    }
+    
+    span {
+      font-weight: 500;
+    }
+  }
+  
+  &.active {
+    background: rgba(0, 162, 255, 0.15);
+    color: $text-primary;
+    
+    i {
+      color: $accent-light;
+    }
+  }
+}
+
+// Menu overlay
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1500;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-fast;
+  
+  &.active {
+    opacity: 1;
+    visibility: visible;
   }
 }
