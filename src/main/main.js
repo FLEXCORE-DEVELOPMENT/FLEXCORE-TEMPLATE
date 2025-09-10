@@ -32,6 +32,13 @@ class MainWindow {
     this.setupEventHandlers();
     this.registerGlobalShortcuts();
     this.setupAutoLaunch();
+    
+    // Create tray if any tray-related behavior is enabled
+    if (this.settings.behavior?.closeToTray || 
+        this.settings.behavior?.minimizeToTray || 
+        this.settings.behavior?.startMinimizedToTray) {
+      this.createTray();
+    }
   }
 
   loadSettings() {
@@ -253,64 +260,6 @@ class MainWindow {
     }
   }
 
-  createTray() {
-    if (this.tray) return; // Tray already exists
-
-    try {
-      // Create tray icon
-      const trayIconPath = path.join(__dirname, '../../assets/favicon.ico');
-      this.tray = new Tray(trayIconPath);
-      
-      // Set tray tooltip
-      this.tray.setToolTip('FlexCore Template');
-      
-      // Create tray context menu
-      const contextMenu = Menu.buildFromTemplate([
-        {
-          label: 'Show Window',
-          click: () => {
-            if (this.window) {
-              this.window.show();
-              this.window.focus();
-            }
-          }
-        },
-        {
-          label: 'Hide Window',
-          click: () => {
-            if (this.window) {
-              this.window.hide();
-            }
-          }
-        },
-        { type: 'separator' },
-        {
-          label: 'Quit',
-          click: () => {
-            // Set flag to indicate this is a forced quit from tray
-            this.isForceQuitting = true;
-            app.quit();
-          }
-        }
-      ]);
-      
-      this.tray.setContextMenu(contextMenu);
-      
-      // Handle tray click to show/hide window
-      this.tray.on('click', () => {
-        if (this.window) {
-          if (this.window.isVisible()) {
-            this.window.hide();
-          } else {
-            this.window.show();
-            this.window.focus();
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Error creating tray:', error);
-    }
-  }
 
   setupEventHandlers() {
     // IPC handlers for window controls
@@ -486,40 +435,75 @@ class MainWindow {
   }
 
   createTray() {
-    // Create tray icon
-    const trayIconPath = path.join(__dirname, '../../assets/favicon.ico');
-    this.tray = new Tray(trayIconPath);
-    
-    // Set initial tray menu
-    this.updateTrayMenu();
+    if (this.tray) return; // Tray already exists
 
-    // Set tray properties with enhanced styling
-    this.tray.setToolTip('FlexCore Application - Double-click to toggle, Right-click for menu');
-    
-    // Platform-specific tray enhancements
-    if (process.platform === 'win32') {
-      // Windows-specific tray styling
-      this.tray.setIgnoreDoubleClickEvents(false);
-    } else if (process.platform === 'darwin') {
-      // macOS-specific tray styling
-      this.tray.setPressedImage(trayIconPath);
-    }
-    
-    // Handle tray double-click (show/hide window)
-    this.tray.on('double-click', () => {
-      if (this.window.isVisible()) {
-        this.window.hide();
-      } else {
-        this.window.show();
-        this.window.focus();
+    try {
+      // Create tray icon
+      const trayIconPath = path.join(__dirname, '../../assets/favicon.ico');
+      
+      // Check if icon file exists
+      if (!fs.existsSync(trayIconPath)) {
+        console.error('Tray icon file not found:', trayIconPath);
+        return;
       }
-      // Update menu after visibility change
-      setTimeout(() => this.updateTrayMenu(), 100);
-    });
+
+      this.tray = new Tray(trayIconPath);
+      
+      // Set initial tray menu
+      this.updateTrayMenu();
+
+      // Set tray properties with enhanced styling
+      this.tray.setToolTip('FlexCore Template - Double-click to toggle, Right-click for menu');
+      
+      // Platform-specific tray enhancements
+      if (process.platform === 'win32') {
+        // Windows-specific tray styling
+        this.tray.setIgnoreDoubleClickEvents(false);
+      } else if (process.platform === 'darwin') {
+        // macOS-specific tray styling
+        this.tray.setPressedImage(trayIconPath);
+      }
+      
+      // Handle tray double-click (show/hide window)
+      this.tray.on('double-click', () => {
+        if (this.window && !this.window.isDestroyed()) {
+          if (this.window.isVisible()) {
+            this.window.hide();
+          } else {
+            this.window.show();
+            this.window.focus();
+          }
+          // Update menu after visibility change
+          setTimeout(() => this.updateTrayMenu(), 100);
+        }
+      });
+
+      // Handle single click for Windows/Linux (show/hide window)
+      this.tray.on('click', () => {
+        if (process.platform !== 'darwin') { // Don't handle click on macOS, use double-click instead
+          if (this.window && !this.window.isDestroyed()) {
+            if (this.window.isVisible()) {
+              this.window.hide();
+            } else {
+              this.window.show();
+              this.window.focus();
+            }
+            // Update menu after visibility change
+            setTimeout(() => this.updateTrayMenu(), 100);
+          }
+        }
+      });
+
+      console.log('Tray icon created successfully');
+    } catch (error) {
+      console.error('Error creating tray:', error);
+    }
   }
 
   updateTrayMenu() {
-    const isVisible = this.window && this.window.isVisible();
+    if (!this.tray) return; // No tray to update
+    
+    const isVisible = this.window && !this.window.isDestroyed() && this.window.isVisible();
     
     // Create dynamic context menu based on window visibility
     const contextMenu = Menu.buildFromTemplate([
@@ -534,9 +518,11 @@ class MainWindow {
         label: 'SHOW',
         accelerator: 'CmdOrCtrl+Shift+S',
         click: () => {
-          this.window.show();
-          this.window.focus();
-          setTimeout(() => this.updateTrayMenu(), 100);
+          if (this.window && !this.window.isDestroyed()) {
+            this.window.show();
+            this.window.focus();
+            setTimeout(() => this.updateTrayMenu(), 100);
+          }
         }
       }]),
       // Show 'Hide' only when window is visible
@@ -544,20 +530,27 @@ class MainWindow {
         label: 'HIDE',
         accelerator: 'CmdOrCtrl+Shift+H',
         click: () => {
-          this.window.hide();
-          setTimeout(() => this.updateTrayMenu(), 100);
+          if (this.window && !this.window.isDestroyed()) {
+            this.window.hide();
+            setTimeout(() => this.updateTrayMenu(), 100);
+          }
         }
       }] : []),
       {
-        label: 'CLOSE',
+        label: 'QUIT',
         accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
         click: () => {
+          this.isForceQuitting = true;
           app.quit();
         }
       }
     ]);
 
-    this.tray.setContextMenu(contextMenu);
+    try {
+      this.tray.setContextMenu(contextMenu);
+    } catch (error) {
+      console.error('Error updating tray menu:', error);
+    }
   }
 
   closeSplashAndShowMain() {
@@ -592,11 +585,26 @@ class MainWindow {
       console.log('Main window not ready yet');
     }
   }
+
+  destroyTray() {
+    if (this.tray && !this.tray.isDestroyed()) {
+      this.tray.destroy();
+      this.tray = null;
+      console.log('Tray destroyed');
+    }
+  }
 }
 
 // App event handlers
 app.whenReady().then(() => {
-  new MainWindow();
+  const mainWindow = new MainWindow();
+  
+  // Ensure tray is destroyed when app is quitting
+  app.on('before-quit', () => {
+    if (mainWindow && mainWindow.destroyTray) {
+      mainWindow.destroyTray();
+    }
+  });
 
   app.on('activate', () => {
     // On macOS, re-create window when dock icon is clicked
