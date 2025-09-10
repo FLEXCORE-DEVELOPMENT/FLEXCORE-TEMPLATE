@@ -1,3 +1,6 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
 // Custom Titlebar Styles
 .titlebar {
   display: flex;
@@ -16,8 +19,114 @@
 }
 
 .titlebar-content {
-  @include flex-center;
+  @include flex-between;
   width: 100%;
+}
+
+.titlebar-menu {
+  position: relative;
+  -webkit-app-region: no-drag;
+}
+
+.app-menu-button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  @include flex-center;
+  border-radius: $border-radius-sm;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  &.active {
+    background: rgba($accent-color, 0.2);
+  }
+}
+
+.app-menu-icon {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
+  transition: filter $transition-fast;
+  
+  .app-menu-button:hover & {
+    filter: brightness(0) invert(1) drop-shadow(0 0 4px $accent-color);
+  }
+}
+
+.app-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: $secondary-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all $transition-normal;
+  z-index: 1001;
+  backdrop-filter: blur(10px);
+  
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+  
+  &:hover {
+    background: rgba($accent-color, 0.1);
+  }
+  
+  &:active {
+    background: rgba($accent-color, 0.2);
+  }
+  
+  &:first-child {
+    border-radius: $border-radius-md $border-radius-md 0 0;
+  }
+  
+  &:last-child {
+    border-radius: 0 0 $border-radius-md $border-radius-md;
+  }
+}
+
+.menu-icon {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+}
+
+.menu-text {
+  font-size: 13px;
+  color: $text-secondary;
+  font-weight: 400;
+}
+
+.menu-separator {
+  height: 1px;
+  background: $border-color;
+  margin: $spacing-xs 0;
 }
 
 .titlebar-title {
@@ -26,12 +135,8 @@
   font-size: 13px;
   font-weight: 500;
   color: $text-secondary;
-}
-
-.app-icon {
-  color: $accent-color;
-  font-weight: bold;
-  font-size: 14px;
+  flex: 1;
+  justify-content: center;
 }
 
 .app-name {

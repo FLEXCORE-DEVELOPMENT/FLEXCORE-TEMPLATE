@@ -1,3 +1,6 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
 // Main Content Layout
 .main-content {
   height: calc(100vh - #{$titlebar-height});

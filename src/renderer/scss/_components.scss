@@ -1,3 +1,6 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
 // Feature Grid and Cards
 .feature-grid {
   display: grid;

@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 // Responsive Design
 @media (max-width: $breakpoint-mobile) {
   .container {
