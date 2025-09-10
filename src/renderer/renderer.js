@@ -17,7 +17,13 @@ class AppRenderer {
         this.setupButtonStyleSelector();
         this.setupAccentColorSelector();
         this.setupBehaviorSettings();
+        this.setupConfigActions();
         await this.updateMaximizeButton();
+        
+        // Apply saved settings on startup
+        this.applyFont(this.settings.appearance?.fontFamily || 'smooch-sans');
+        this.applyButtonStyle(this.settings.appearance?.titlebarButtonStyle || 'round');
+        this.applyAccentColor(this.settings.appearance?.accentColor || '#00a2ff');
     }
 
     setupWindowControls() {
@@ -156,9 +162,10 @@ class AppRenderer {
 
         // Set background color based on type
         const colors = {
-            primary: 'linear-gradient(135deg, #9d4edd, #c77dff)',
+            primary: 'linear-gradient(135deg, #28ca42, #4db8ff)',
             secondary: '#3e3e42',
-            info: '#0ea5e9'
+            info: '#0ea5e9',
+            error: '#ef4444'
         };
         notification.style.background = colors[type] || colors.info;
 
@@ -441,6 +448,108 @@ class AppRenderer {
                     const isChecked = event.target.checked;
                     await window.electronAPI.saveSetting(setting.key, isChecked);
                 });
+            }
+        });
+    }
+
+    setupConfigActions() {
+        // Restore defaults button
+        const restoreDefaultsBtn = document.getElementById('restore-defaults-btn');
+        if (restoreDefaultsBtn) {
+            restoreDefaultsBtn.addEventListener('click', async () => {
+                try {
+                    restoreDefaultsBtn.disabled = true;
+                    restoreDefaultsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restoring...';
+                    
+                    // Restore default settings
+                    this.settings = await window.electronAPI.restoreDefaultSettings();
+                    
+                    // Update all UI elements with new settings
+                    this.updateAllSettingsUI();
+                    
+                    // Apply the new settings
+                    this.applyFont(this.settings.appearance.fontFamily);
+                    this.applyButtonStyle(this.settings.appearance.titlebarButtonStyle);
+                    this.applyAccentColor(this.settings.appearance.accentColor);
+                    
+                    this.showNotification('Settings restored to default', 'primary');
+                } catch (error) {
+                    console.error('Error restoring defaults:', error);
+                    this.showNotification('Failed to restore defaults', 'error');
+                } finally {
+                    restoreDefaultsBtn.disabled = false;
+                    restoreDefaultsBtn.innerHTML = '<i class="fas fa-undo"></i> Restore to Default';
+                }
+            });
+        }
+
+        // Export settings button
+        const exportSettingsBtn = document.getElementById('export-settings-btn');
+        if (exportSettingsBtn) {
+            exportSettingsBtn.addEventListener('click', async () => {
+                try {
+                    exportSettingsBtn.disabled = true;
+                    exportSettingsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+                    
+                    const result = await window.electronAPI.exportSettings();
+                    
+                    if (result.success) {
+                        this.showNotification(`Settings exported to ${result.path}`, 'primary');
+                    } else if (result.canceled) {
+                        this.showNotification('Export canceled', 'info');
+                    } else {
+                        this.showNotification(`Export failed: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error exporting settings:', error);
+                    this.showNotification('Failed to export settings', 'error');
+                } finally {
+                    exportSettingsBtn.disabled = false;
+                    exportSettingsBtn.innerHTML = '<i class="fas fa-download"></i> Export Settings';
+                }
+            });
+        }
+    }
+
+    updateAllSettingsUI() {
+        // Update font selector
+        const fontSelect = document.getElementById('font-select');
+        if (fontSelect) {
+            fontSelect.value = this.settings.appearance?.fontFamily || 'inconsolata';
+        }
+
+        // Update button style selector
+        const buttonStyleSelect = document.getElementById('button-style-select');
+        if (buttonStyleSelect) {
+            buttonStyleSelect.value = this.settings.appearance?.titlebarButtonStyle || 'square';
+        }
+
+        // Update accent color selector
+        const accentColorSelect = document.getElementById('accent-color-select');
+        if (accentColorSelect) {
+            accentColorSelect.value = this.settings.appearance?.accentColor || '#28ca42';
+        }
+
+        // Update window state selector
+        const windowStateSelect = document.getElementById('window-state-select');
+        if (windowStateSelect) {
+            windowStateSelect.value = this.settings.behavior?.defaultWindowState || 'normal';
+        }
+
+        // Update behavior checkboxes
+        const behaviorSettings = [
+            { id: 'remember-window-size', key: 'rememberWindowSize' },
+            { id: 'launch-on-startup', key: 'launchOnStartup' },
+            { id: 'start-minimized-to-tray', key: 'startMinimizedToTray' },
+            { id: 'minimize-to-tray', key: 'minimizeToTray' },
+            { id: 'close-to-tray', key: 'closeToTray' },
+            { id: 'always-on-top', key: 'alwaysOnTop' }
+        ];
+
+        behaviorSettings.forEach(setting => {
+            const checkbox = document.getElementById(setting.id);
+            if (checkbox) {
+                checkbox.checked = this.settings.behavior?.[setting.key] || false;
             }
         });
     }

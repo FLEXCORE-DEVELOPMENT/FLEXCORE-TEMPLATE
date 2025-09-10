@@ -89,6 +89,64 @@
   accent-color: $accent-color;
 }
 
+// Config Actions
+.config-actions {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.config-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  border: none;
+  border-radius: $border-radius-md;
+  font-family: inherit;
+  font-size: $font-size-base;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 140px;
+  
+  i {
+    font-size: $font-size-sm;
+  }
+  
+  &:focus {
+    outline: 2px solid $accent-color;
+    outline-offset: 2px;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.config-button-primary {
+  background: linear-gradient(135deg, $accent-color, $accent-light);
+  color: $text-primary;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(40, 202, 66, 0.4);
+  }
+}
+
+.config-button-secondary {
+  background: transparent;
+  color: $text-secondary;
+  border: 2px solid $border-color;
+  
+  &:hover:not(:disabled) {
+    border-color: $accent-color;
+    color: $accent-color;
+    transform: translateY(-2px);
+  }
+}
+
 // About Page Styles
 .about-content {
   max-width: 600px;

@@ -177,6 +177,61 @@ class MainWindow {
       }
     });
 
+    // Settings management handlers
+    ipcMain.handle('restore-default-settings', () => {
+      this.settings = {
+        appearance: {
+          theme: "dark",
+          fontFamily: "inconsolata",
+          accentColor: "#28ca42",
+          titlebarButtonStyle: "square"
+        },
+        behavior: {
+          defaultWindowState: "normal",
+          rememberWindowSize: true,
+          launchOnStartup: false,
+          startMinimizedToTray: true,
+          minimizeToTray: false,
+          closeToTray: true,
+          alwaysOnTop: false
+        },
+        window: {
+          width: 1200,
+          height: 800,
+          x: null,
+          y: null
+        }
+      };
+      this.saveSettings();
+      return this.settings;
+    });
+
+    ipcMain.handle('export-settings', async () => {
+      const { dialog } = require('electron');
+      
+      const result = await dialog.showSaveDialog(this.window, {
+        title: 'Export Settings',
+        defaultPath: 'settings.json',
+        filters: [
+          { name: 'JSON Files', extensions: ['json'] },
+          { name: 'All Files', extensions: ['*'] }
+        ],
+        properties: ['createDirectory']
+      });
+
+      if (!result.canceled && result.filePath) {
+        try {
+          const fs = require('fs');
+          fs.writeFileSync(result.filePath, JSON.stringify(this.settings, null, 2));
+          return { success: true, path: result.filePath };
+        } catch (error) {
+          return { success: false, error: error.message };
+        }
+      }
+      
+      return { success: false, canceled: true };
+    });
+
     // Handle maximize/unmaximize events to update UI
     if (this.window) {
       this.window.on('maximize', () => {

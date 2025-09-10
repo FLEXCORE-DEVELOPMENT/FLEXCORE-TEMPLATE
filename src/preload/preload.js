@@ -17,7 +17,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Settings
   getSettings: () => ipcRenderer.invoke('get-settings'),
-  saveSetting: (key, value) => ipcRenderer.invoke('save-setting', key, value)
+  saveSetting: (key, value) => ipcRenderer.invoke('save-setting', key, value),
+  restoreDefaultSettings: () => ipcRenderer.invoke('restore-default-settings'),
+  exportSettings: () => ipcRenderer.invoke('export-settings')
 });
 
 // Remove listeners

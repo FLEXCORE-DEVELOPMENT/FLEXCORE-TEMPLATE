@@ -2,16 +2,16 @@
   "appearance": {
     "theme": "dark",
     "fontFamily": "inconsolata",
-    "accentColor": "#ff6b35",
+    "accentColor": "#28ca42",
     "titlebarButtonStyle": "square"
   },
   "behavior": {
     "defaultWindowState": "normal",
     "rememberWindowSize": true,
     "launchOnStartup": false,
-    "startMinimizedToTray": false,
+    "startMinimizedToTray": true,
     "minimizeToTray": false,
-    "closeToTray": false,
+    "closeToTray": true,
     "alwaysOnTop": false
   },
   "window": {
