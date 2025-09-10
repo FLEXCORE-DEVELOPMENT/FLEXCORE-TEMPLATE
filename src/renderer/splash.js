@@ -6,33 +6,53 @@ class SplashScreen {
     this.currentProgress = 0;
     this.targetProgress = 0;
     this.loadingSteps = [
-      { progress: 20, text: 'Initializing...' },
-      { progress: 40, text: 'Loading modules...' },
-      { progress: 60, text: 'Setting up interface...' },
-      { progress: 80, text: 'Applying theme...' },
+      { progress: 15, text: 'Initializing...' },
+      { progress: 30, text: 'Loading settings...' },
+      { progress: 50, text: 'Loading modules...' },
+      { progress: 70, text: 'Setting up interface...' },
+      { progress: 90, text: 'Applying theme...' },
       { progress: 100, text: 'Ready!' }
     ];
     this.currentStep = 0;
+    this.settings = null;
     
     this.init();
   }
 
-  init() {
-    // Apply theme from settings
+  async init() {
+    // Load settings first
+    await this.loadSettings();
+    
+    // Apply theme from loaded settings
     this.applyTheme();
     
     // Start loading sequence
     this.startLoadingSequence();
-    
-    // Listen for theme updates
-    window.electronAPI?.onThemeChanged?.(this.applyTheme.bind(this));
+  }
+
+  async loadSettings() {
+    try {
+      if (window.electronAPI && window.electronAPI.getSettings) {
+        this.settings = await window.electronAPI.getSettings();
+        console.log('Splash: Loaded settings:', this.settings);
+      } else {
+        console.warn('Splash: electronAPI.getSettings not available, using defaults');
+        this.settings = null;
+      }
+    } catch (error) {
+      console.error('Splash: Error loading settings:', error);
+      this.settings = null;
+    }
   }
 
   applyTheme() {
-    // Get theme from settings or default to dark
-    const theme = window.electronAPI?.getSettings?.()?.appearance?.theme || 'dark';
-    const accentColor = window.electronAPI?.getSettings?.()?.appearance?.accentColor || '#9d4edd';
+    // Get theme and accent color from loaded settings or use defaults
+    const theme = this.settings?.appearance?.theme || 'dark';
+    const accentColor = this.settings?.appearance?.accentColor || '#00a2ff';
     
+    console.log('Splash: Applying theme:', theme, 'accent:', accentColor);
+    
+    // Apply theme attribute
     document.documentElement.setAttribute('data-theme', theme);
     
     // Update CSS custom properties for accent color
@@ -41,6 +61,22 @@ class SplashScreen {
     // Calculate lighter variant for gradients
     const lighterAccent = this.lightenColor(accentColor, 20);
     document.documentElement.style.setProperty('--accent-light', lighterAccent);
+    
+    // Apply theme-specific background colors
+    if (theme === 'light') {
+      document.documentElement.style.setProperty('--primary-bg', '#ffffff');
+      document.documentElement.style.setProperty('--secondary-bg', '#f8f9fa');
+      document.documentElement.style.setProperty('--text-primary', '#212529');
+      document.documentElement.style.setProperty('--text-secondary', '#6c757d');
+      document.documentElement.style.setProperty('--border-color', '#dee2e6');
+    } else {
+      // Dark theme (default)
+      document.documentElement.style.setProperty('--primary-bg', '#1a1a1a');
+      document.documentElement.style.setProperty('--secondary-bg', '#2d2d30');
+      document.documentElement.style.setProperty('--text-primary', '#ffffff');
+      document.documentElement.style.setProperty('--text-secondary', '#cccccc');
+      document.documentElement.style.setProperty('--border-color', '#3e3e42');
+    }
   }
 
   lightenColor(color, percent) {

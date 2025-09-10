@@ -5,11 +5,17 @@ class AppRenderer {
         this.isMaximized = false;
         this.hasUnsavedChanges = false;
         this.pendingSettings = {};
+        this.homePage = null;
+        this.currentPage = 'home'; // Track current page
         this.init();
     }
 
     async init() {
         this.settings = await window.electronAPI.getSettings();
+        
+        // Load home page first
+        await this.loadHomePage();
+        
         this.setupWindowControls();
         this.setupWindowStateListeners();
         this.setupAppInteractions();
@@ -34,6 +40,66 @@ class AppRenderer {
         
         // Update OS information on Details page (with delay to ensure DOM is ready)
         setTimeout(() => this.updateOSInfo(), 500);
+    }
+
+    async loadHomePage() {
+        try {
+            const response = await fetch('home.html');
+            const homeContent = await response.text();
+            
+            const homeContainer = document.getElementById('home-page-container');
+            if (homeContainer) {
+                homeContainer.innerHTML = homeContent;
+                
+                // Show home page by default only on initial load
+                homeContainer.classList.remove('hidden');
+                
+                // Initialize home page functionality
+                if (window.HomePage) {
+                    this.homePage = new window.HomePage();
+                }
+            }
+        } catch (error) {
+            console.error('Error loading home page:', error);
+            // Fallback: create basic home page structure
+            this.createFallbackHomePage();
+        }
+    }
+
+    createFallbackHomePage() {
+        const homeContainer = document.getElementById('home-page-container');
+        if (homeContainer) {
+            homeContainer.innerHTML = `
+                <div class="page" id="home-page">
+                    <header class="app-header">
+                        <h1 class="app-title">FLEXCORE</h1>
+                        <p class="app-subtitle">Modern Electron Application</p>
+                    </header>
+                    <main class="content-area">
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon"><i class="fas fa-palette"></i></div>
+                                <h3>Modern UI</h3>
+                                <p>Clean and modern interface with custom titlebar</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                                <h3>Secure</h3>
+                                <p>Built with Electron security best practices</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon"><i class="fas fa-desktop"></i></div>
+                                <h3>Cross-Platform</h3>
+                                <p>Works on Windows, macOS, and Linux</p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+            
+            // Show home page container for fallback
+            homeContainer.classList.remove('hidden');
+        }
     }
 
     setupWindowControls() {
@@ -271,22 +337,45 @@ class AppRenderer {
     }
 
     navigateToPage(pageName) {
-        // Hide all pages
+        // Update current page tracking
+        this.currentPage = pageName;
+        
+        // Hide all pages including home page container
         const pages = document.querySelectorAll('.page');
         pages.forEach(page => {
             page.classList.add('hidden');
         });
+        
+        // Also hide home page container
+        const homeContainer = document.getElementById('home-page-container');
+        if (homeContainer) {
+            homeContainer.classList.add('hidden');
+        }
 
         // Show selected page (handle configs -> config and details mappings)
         const pageId = pageName === 'configs' ? 'config' : 
                       pageName === 'details' ? 'details' : pageName;
-        const targetPage = document.getElementById(`${pageId}-page`);
-        if (targetPage) {
-            targetPage.classList.remove('hidden');
-            
-            // Update OS info when navigating to Details page
-            if (pageId === 'details') {
-                setTimeout(() => this.updateOSInfo(), 100);
+        
+        // Special handling for home page
+        if (pageId === 'home') {
+            if (homeContainer) {
+                homeContainer.classList.remove('hidden');
+                
+                // Refresh home page if it exists
+                if (this.homePage && this.homePage.refresh) {
+                    this.homePage.refresh();
+                }
+            }
+        } else {
+            // Show other pages
+            const targetPage = document.getElementById(`${pageId}-page`);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                
+                // Update OS info when navigating to Details page
+                if (pageId === 'details') {
+                    setTimeout(() => this.updateOSInfo(), 100);
+                }
             }
         }
 
@@ -296,10 +385,20 @@ class AppRenderer {
             link.classList.remove('active');
         });
 
-        const activeLink = document.querySelector(`.menu-link span:contains('${pageName.charAt(0).toUpperCase() + pageName.slice(1)}')`);
-        if (activeLink) {
-            activeLink.closest('.menu-link').classList.add('active');
-        }
+        // Find and activate the correct menu item
+        menuLinks.forEach(link => {
+            const span = link.querySelector('span');
+            if (span) {
+                const linkText = span.textContent.toLowerCase();
+                const targetName = pageName.toLowerCase();
+                
+                if ((linkText === 'home' && targetName === 'home') ||
+                    (linkText === 'configs' && targetName === 'configs') ||
+                    (linkText === 'details' && targetName === 'details')) {
+                    link.classList.add('active');
+                }
+            }
+        });
     }
 
     setupTrayNavigation() {
@@ -694,6 +793,7 @@ class AppRenderer {
                         await window.electronAPI.updateGlobalShortcuts();
                     }
                     
+                    
                     this.showNotification('Settings saved successfully', 'primary');
                 } catch (error) {
                     console.error('Error saving settings:', error);
@@ -725,15 +825,6 @@ class AppRenderer {
                     this.updateAllSettingsUI();
                     this.setupAdvancedSettings();
                     
-                    // Apply the new settings
-                    this.applyFont(this.settings.appearance.fontFamily);
-                    this.applyFontSize(this.settings.appearance.fontSize);
-                    this.applyButtonStyle(this.settings.appearance.titlebarButtonStyle);
-                    this.applyAccentColor(this.settings.appearance.accentColor);
-                    
-                    // Re-setup selectors to update UI
-                    this.setupFontSelector();
-                    this.setupFontSizeSelector();
                     
                     this.showNotification('Settings restored to default', 'primary');
                 } catch (error) {
@@ -775,6 +866,14 @@ class AppRenderer {
     }
 
     updateAllSettingsUI() {
+        // Update theme selector
+        const themeSelect = document.getElementById('theme-select');
+        if (themeSelect) {
+            const theme = this.settings.appearance?.theme || 'dark';
+            themeSelect.value = theme;
+            this.applyTheme(theme);
+        }
+
         // Update font selector
         const fontSelect = document.getElementById('font-select');
         if (fontSelect) {
@@ -915,7 +1014,7 @@ class AppRenderer {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new AppRenderer();
+    window.appRenderer = new AppRenderer();
 });
 
 // Handle any uncaught errors gracefully

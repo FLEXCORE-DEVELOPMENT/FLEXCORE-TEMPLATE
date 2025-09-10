@@ -3,7 +3,7 @@
     "theme": "dark",
     "fontFamily": "inconsolata",
     "fontSize": "small",
-    "accentColor": "#ff6b35",
+    "accentColor": "#00a2ff",
     "titlebarButtonStyle": "square"
   },
   "behavior": {
@@ -12,7 +12,7 @@
     "launchOnStartup": false,
     "startMinimizedToTray": false,
     "minimizeToTray": false,
-    "closeToTray": true,
+    "closeToTray": false,
     "alwaysOnTop": false
   },
   "advanced": {
@@ -27,7 +27,7 @@
   "window": {
     "width": 1200,
     "height": 800,
-    "x": 189,
-    "y": 141
+    "x": 360,
+    "y": 116
   }
 }

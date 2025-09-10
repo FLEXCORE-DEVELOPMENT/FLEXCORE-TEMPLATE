@@ -1,0 +1,328 @@
+// Home page specific styles
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// Home page container
+#home-page {
+    .app-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        
+        .app-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            
+            @include responsive(tablet) {
+                font-size: 2.8rem;
+            }
+            
+            @include responsive(mobile) {
+                font-size: 2.2rem;
+            }
+        }
+        
+        .app-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            
+            @include responsive(mobile) {
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+// Feature grid
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    
+    @include responsive(mobile) {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+.feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    
+    // Initial state for animation
+    opacity: 0;
+    transform: translateY(20px);
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        transform-origin: left;
+    }
+    
+    &:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent-color);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        
+        &::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-icon {
+            transform: scale(1.1);
+            color: var(--accent-color);
+        }
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--accent-color);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        
+        @include responsive(mobile) {
+            font-size: 2rem;
+        }
+    }
+    
+    h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        
+        @include responsive(mobile) {
+            font-size: 1.2rem;
+        }
+    }
+    
+    p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+}
+
+// Home stats section
+.home-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: var(--secondary-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    
+    @include responsive(mobile) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+}
+
+.stat-item {
+    text-align: center;
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--accent-color);
+        margin-bottom: 0.5rem;
+        font-family: 'Inconsolata', monospace;
+        
+        @include responsive(mobile) {
+            font-size: 2rem;
+        }
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+        
+        @include responsive(mobile) {
+            font-size: 0.8rem;
+        }
+    }
+}
+
+// Home actions
+.home-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    
+    @include responsive(mobile) {
+        gap: 1rem;
+    }
+}
+
+.home-button {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    min-width: 140px;
+    justify-content: center;
+    
+    @include responsive(mobile) {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+    
+    i {
+        font-size: 1.1rem;
+    }
+    
+    &.primary {
+        background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+        color: white;
+        
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 162, 255, 0.3);
+        }
+        
+        &:active {
+            transform: translateY(0);
+        }
+    }
+    
+    &.secondary {
+        background: transparent;
+        color: var(--text-primary);
+        border: 2px solid var(--border-color);
+        
+        &:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+// Animation classes for JavaScript
+.feature-card.animate-in {
+    animation: slideInUp 0.6s ease forwards;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Counter animation for stats
+.stat-number.counting {
+    animation: pulse 0.1s ease;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+// Welcome message (can be added dynamically)
+.welcome-message {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    text-align: center;
+    
+    .welcome-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .welcome-text {
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+}
+
+// Loading states
+.home-loading {
+    .feature-card {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    
+    .stat-number {
+        opacity: 0.5;
+    }
+}
+
+// Dark theme specific adjustments
+[data-theme="dark"] {
+    .feature-card {
+        &:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+    }
+    
+    .home-stats {
+        background: rgba(45, 45, 48, 0.5);
+    }
+}
+
+// Light theme specific adjustments
+[data-theme="light"] {
+    .feature-card {
+        &:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+    }
+    
+    .home-stats {
+        background: rgba(248, 249, 250, 0.8);
+    }
+}

@@ -18,7 +18,8 @@ $particle-size: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, $primary-bg 0%, $secondary-bg 100%);
+  background: linear-gradient(135deg, var(--primary-bg, #{$primary-bg}) 0%, var(--secondary-bg, #{$secondary-bg}) 100%);
+  transition: background 0.3s ease;
 }
 
 .splash-content {
@@ -38,16 +39,18 @@ $particle-size: 4px;
   flex-direction: column;
   gap: 8px;
   padding: 20px;
-  background: $secondary-bg;
+  background: var(--secondary-bg, #{$secondary-bg});
   border-radius: $border-radius-lg;
-  border: 2px solid $border-color;
+  border: 2px solid var(--border-color, #{$border-color});
   box-shadow: $shadow-lg;
+  transition: all 0.3s ease;
 
   .large {
     width: $logo-size-large;
     height: $logo-size-large;
-    background: $accent-color;
+    background: var(--accent-color, #{$accent-color});
     border-radius: $border-radius-md;
+    transition: background-color 0.3s ease;
     margin: 0 auto 8px;
     animation: logoGlow 2s ease-in-out infinite alternate;
   }
@@ -55,9 +58,10 @@ $particle-size: 4px;
   .small {
     width: $logo-size-small;
     height: $logo-size-small;
-    background: $accent-color;
+    background: var(--accent-color, #{$accent-color});
     border-radius: $border-radius-sm;
     opacity: 0.8;
+    transition: background-color 0.3s ease;
     animation: logoGlow 2s ease-in-out infinite alternate;
     animation-delay: 0.3s;
 
@@ -72,17 +76,19 @@ $particle-size: 4px;
   font-size: 2.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  background: linear-gradient(45deg, $accent-color, $accent-light);
+  background: linear-gradient(45deg, var(--accent-color, #{$accent-color}), var(--accent-light, #{$accent-light}));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  transition: background 0.3s ease;
   animation: textShimmer 3s ease-in-out infinite;
 }
 
 .app-tagline {
   font-size: 1rem;
-  color: $text-secondary;
+  color: var(--text-secondary, #{$text-secondary});
   margin-bottom: 3rem;
+  transition: color 0.3s ease;
   animation: fadeIn 1s ease-out 0.5s both;
 }
 
@@ -95,27 +101,30 @@ $particle-size: 4px;
 .loading-bar {
   width: $loading-bar-width;
   height: $loading-bar-height;
-  background: $secondary-bg;
+  background: var(--secondary-bg, #{$secondary-bg});
   border-radius: calc($loading-bar-height / 2);
   margin: 0 auto 1rem;
   overflow: hidden;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color, #{$border-color});
+  transition: background-color 0.3s ease, border-color 0.3s ease;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .loading-progress {
   height: 100%;
-  background: linear-gradient(90deg, $accent-color, $accent-light, $accent-color);
+  background: linear-gradient(90deg, var(--accent-color, #{$accent-color}), var(--accent-light, #{$accent-light}), var(--accent-color, #{$accent-color}));
   background-size: 200% 100%;
   border-radius: calc($loading-bar-height / 2);
   width: 0%;
+  transition: background 0.3s ease;
   animation: loadingProgress 3s ease-in-out, gradientShift 2s linear infinite;
 }
 
 .loading-text {
   font-size: 0.9rem;
-  color: $text-secondary;
+  color: var(--text-secondary, #{$text-secondary});
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 // Loading dots
@@ -128,8 +137,9 @@ $particle-size: 4px;
   .dot {
     width: 8px;
     height: 8px;
-    background: $accent-color;
+    background: var(--accent-color, #{$accent-color});
     border-radius: 50%;
+    transition: background-color 0.3s ease;
     animation: dotBounce 1.4s ease-in-out infinite both;
 
     &:nth-child(1) { animation-delay: -0.32s; }
@@ -153,9 +163,10 @@ $particle-size: 4px;
   position: absolute;
   width: $particle-size;
   height: $particle-size;
-  background: $accent-color;
+  background: var(--accent-color, #{$accent-color});
   border-radius: 50%;
   opacity: 0.3;
+  transition: background-color 0.3s ease;
   animation: floatParticle 8s linear infinite;
 
   @for $i from 1 through 5 {
