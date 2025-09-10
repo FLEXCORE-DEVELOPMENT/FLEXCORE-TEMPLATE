@@ -4,11 +4,14 @@ const path = require('path');
 // Enable live reload for development
 if (process.argv.includes('--dev')) {
   try {
-    require('electron-reload')(__dirname, {
+    require('electron-reload')(path.join(__dirname, '..'), {
       electron: path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron'),
       hardResetMethod: 'exit',
-      ignore: /node_modules|[\/\\]\./,
-      awaitWriteFinish: true
+      ignore: /node_modules|[\/\\]\.|\.git/,
+      awaitWriteFinish: {
+        stabilityThreshold: 100,
+        pollInterval: 100
+      }
     });
   } catch (err) {
     console.log('Electron reload not available in production');
@@ -42,7 +45,7 @@ class MainWindow {
         allowRunningInsecureContent: false, // Security: block insecure content
         experimentalFeatures: false // Security: disable experimental features
       },
-      icon: path.join(__dirname, '../../assets/favicons/favicon.ico')
+      icon: path.join(__dirname, '../../assets/favicon.ico')
     });
 
     // Load the app

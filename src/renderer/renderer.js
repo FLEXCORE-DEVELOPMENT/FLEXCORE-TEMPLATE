@@ -107,9 +107,6 @@ class AppRenderer {
 
         // Add feature card interactions
         this.setupFeatureCards();
-        
-        // Setup app menu
-        this.setupAppMenu();
     }
 
     setupFeatureCards() {
@@ -179,89 +176,6 @@ class AppRenderer {
                 }
             }, 300);
         }, 3000);
-    }
-
-    setupAppMenu() {
-        const menuButton = document.getElementById('app-menu-btn');
-        const menu = document.getElementById('app-menu');
-        const menuItems = document.querySelectorAll('.menu-item');
-
-        // Toggle menu on button click
-        menuButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isOpen = menu.classList.contains('show');
-            
-            if (isOpen) {
-                this.closeAppMenu();
-            } else {
-                this.openAppMenu();
-            }
-        });
-
-        // Handle menu item clicks
-        menuItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                const action = item.getAttribute('data-action');
-                this.handleMenuAction(action);
-                this.closeAppMenu();
-            });
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!menuButton.contains(e.target) && !menu.contains(e.target)) {
-                this.closeAppMenu();
-            }
-        });
-
-        // Close menu on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeAppMenu();
-            }
-        });
-    }
-
-    openAppMenu() {
-        const menuButton = document.getElementById('app-menu-btn');
-        const menu = document.getElementById('app-menu');
-        
-        menuButton.classList.add('active');
-        menu.classList.add('show');
-    }
-
-    closeAppMenu() {
-        const menuButton = document.getElementById('app-menu-btn');
-        const menu = document.getElementById('app-menu');
-        
-        menuButton.classList.remove('active');
-        menu.classList.remove('show');
-    }
-
-    handleMenuAction(action) {
-        switch (action) {
-            case 'about':
-                this.showNotification('FlexCore Template v1.0.0 - Modern Electron Application', 'info');
-                break;
-            case 'settings':
-                this.showNotification('Settings panel coming soon!', 'info');
-                break;
-            case 'devtools':
-                // Toggle DevTools
-                if (window.electronAPI && window.electronAPI.toggleDevTools) {
-                    window.electronAPI.toggleDevTools();
-                } else {
-                    this.showNotification('Press Ctrl+Shift+I to open DevTools', 'info');
-                }
-                break;
-            case 'quit':
-                if (window.electronAPI && window.electronAPI.closeWindow) {
-                    window.electronAPI.closeWindow();
-                }
-                break;
-            default:
-                this.showNotification(`${action} action not implemented yet`, 'info');
-        }
     }
 
     // Utility method to handle keyboard shortcuts

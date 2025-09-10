@@ -3,43 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' https://kit.fontawesome.com;">
     <title>FlexCore App</title>
-    <link rel="icon" type="image/svg+xml" href="../assets/favicons/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://kit.fontawesome.com/b7b0f6bc3b.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Custom Titlebar -->
     <div class="titlebar">
         <div class="titlebar-drag-region">
             <div class="titlebar-content">
-                <div class="titlebar-menu">
-                    <button class="app-menu-button" id="app-menu-btn" title="Application Menu">
-                        <img src="../assets/favicons/favicon.ico" alt="App Icon" class="app-menu-icon">
-                    </button>
-                    <div class="app-menu" id="app-menu">
-                        <div class="menu-item" data-action="about">
-                            <span class="menu-icon">ℹ️</span>
-                            <span class="menu-text">About</span>
-                        </div>
-                        <div class="menu-item" data-action="settings">
-                            <span class="menu-icon">⚙️</span>
-                            <span class="menu-text">Settings</span>
-                        </div>
-                        <div class="menu-separator"></div>
-                        <div class="menu-item" data-action="devtools">
-                            <span class="menu-icon">🔧</span>
-                            <span class="menu-text">Developer Tools</span>
-                        </div>
-                        <div class="menu-separator"></div>
-                        <div class="menu-item" data-action="quit">
-                            <span class="menu-icon">❌</span>
-                            <span class="menu-text">Quit</span>
-                        </div>
-                    </div>
-                </div>
                 <div class="titlebar-title">
-                    <span class="app-name">FLEXCORE TEMPLATE</span>
+                    <span class="app-name">FLEXCORE APP</span>
                 </div>
             </div>
         </div>
@@ -67,7 +46,7 @@
         <div class="container">
             <header class="app-header">
                 <h1 class="app-title">
-                    <span class="hash">#</span>FLEXCORE
+                    FLEXCORE
                 </h1>
                 <p class="app-subtitle">Modern Electron Application</p>
             </header>
