@@ -10,7 +10,7 @@
     <script src="https://kit.fontawesome.com/b7b0f6bc3b.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Custom Titlebar -->
@@ -122,7 +122,7 @@
             <div class="page hidden" id="config-page">
                 <header class="app-header">
                     <h1 class="app-title">
-                        <i class="fas fa-cog"></i> Settings
+                        Settings
                     </h1>
                     <p class="app-subtitle">Customize your application settings</p>
                 </header>
@@ -140,6 +140,13 @@
                                 </select>
                             </div>
                             <div class="config-item">
+                                <label>Font Family</label>
+                                <select class="config-select" id="font-select">
+                                    <option value="smooch-sans">Smooch Sans</option>
+                                    <option value="inconsolata">Inconsolata</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
                                 <label>Accent Color</label>
                                 <input type="color" class="config-color" value="#00a2ff">
                             </div>
@@ -147,6 +154,13 @@
 
                         <div class="config-section">
                             <h3><i class="fas fa-window-maximize"></i> Window</h3>
+                            <div class="config-item">
+                                <label>Titlebar Button Style</label>
+                                <select class="config-select" id="button-style-select">
+                                    <option value="round">Round Buttons</option>
+                                    <option value="square">Square Buttons</option>
+                                </select>
+                            </div>
                             <div class="config-item">
                                 <label>
                                     <input type="checkbox" class="config-checkbox" checked>
@@ -161,21 +175,6 @@
                             </div>
                         </div>
 
-                        <div class="config-section">
-                            <h3><i class="fas fa-bell"></i> Notifications</h3>
-                            <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox" checked>
-                                    Enable notifications
-                                </label>
-                            </div>
-                            <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox">
-                                    Sound notifications
-                                </label>
-                            </div>
-                        </div>
                     </div>
                 </main>
             </div>

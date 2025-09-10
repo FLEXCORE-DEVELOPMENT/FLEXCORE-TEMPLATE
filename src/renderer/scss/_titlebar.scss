@@ -93,6 +93,17 @@
     outline: 1px solid rgba(255, 255, 255, 0.3);
     outline-offset: 2px;
   }
+  
+  // Square button variant
+  &.square-style {
+    border-radius: 2px;
+    width: 14px;
+    height: 14px;
+    
+    .button-dot {
+      border-radius: 2px;
+    }
+  }
 }
 
 // Close button (red)

@@ -12,6 +12,8 @@ class AppRenderer {
         this.setupAppInteractions();
         this.setupMenuControls();
         this.setupTrayNavigation();
+        this.setupFontSelector();
+        this.setupButtonStyleSelector();
         await this.updateMaximizeButton();
     }
 
@@ -262,6 +264,67 @@ class AppRenderer {
         // Listen for tray navigation messages from main process
         window.electronAPI.onNavigateToPage((pageName) => {
             this.navigateToPage(pageName);
+        });
+    }
+
+    setupFontSelector() {
+        const fontSelect = document.getElementById('font-select');
+        if (fontSelect) {
+            // Load saved font preference
+            const savedFont = localStorage.getItem('selectedFont') || 'smooch-sans';
+            fontSelect.value = savedFont;
+            this.applyFont(savedFont);
+
+            // Handle font changes
+            fontSelect.addEventListener('change', (event) => {
+                const selectedFont = event.target.value;
+                this.applyFont(selectedFont);
+                localStorage.setItem('selectedFont', selectedFont);
+            });
+        }
+    }
+
+    applyFont(fontFamily) {
+        const root = document.documentElement;
+        
+        switch (fontFamily) {
+            case 'smooch-sans':
+                root.style.setProperty('--font-family', '"Smooch Sans", sans-serif');
+                break;
+            case 'inconsolata':
+                root.style.setProperty('--font-family', '"Inconsolata", monospace');
+                break;
+            default:
+                root.style.setProperty('--font-family', '"Smooch Sans", sans-serif');
+        }
+    }
+
+    setupButtonStyleSelector() {
+        const buttonStyleSelect = document.getElementById('button-style-select');
+        if (buttonStyleSelect) {
+            // Load saved button style preference
+            const savedStyle = localStorage.getItem('buttonStyle') || 'round';
+            buttonStyleSelect.value = savedStyle;
+            this.applyButtonStyle(savedStyle);
+
+            // Handle button style changes
+            buttonStyleSelect.addEventListener('change', (event) => {
+                const selectedStyle = event.target.value;
+                this.applyButtonStyle(selectedStyle);
+                localStorage.setItem('buttonStyle', selectedStyle);
+            });
+        }
+    }
+
+    applyButtonStyle(style) {
+        const titlebarButtons = document.querySelectorAll('.mac-button');
+        
+        titlebarButtons.forEach(button => {
+            if (style === 'square') {
+                button.classList.add('square-style');
+            } else {
+                button.classList.remove('square-style');
+            }
         });
     }
 }
