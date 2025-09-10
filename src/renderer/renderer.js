@@ -15,6 +15,7 @@ class AppRenderer {
         this.setupAppInteractions();
         this.setupMenuControls();
         this.setupTrayNavigation();
+        this.setupThemeSelector();
         this.setupFontSelector();
         this.setupFontSizeSelector();
         this.setupButtonStyleSelector();
@@ -25,8 +26,9 @@ class AppRenderer {
         await this.updateMaximizeButton();
         
         // Apply saved settings on startup
+        this.applyTheme(this.settings.appearance?.theme || 'dark');
         this.applyFont(this.settings.appearance?.fontFamily || 'smooch-sans');
-        this.applyFontSize(this.settings.appearance?.fontSize || 'medium');
+        this.applyFontSize(this.settings.appearance?.fontSize || 'small');
         this.applyButtonStyle(this.settings.appearance?.titlebarButtonStyle || 'round');
         this.applyAccentColor(this.settings.appearance?.accentColor || '#00a2ff');
     }
@@ -272,8 +274,9 @@ class AppRenderer {
             page.classList.add('hidden');
         });
 
-        // Show selected page (handle settings -> config mapping)
-        const pageId = pageName === 'settings' ? 'config' : pageName;
+        // Show selected page (handle configs -> config and details mappings)
+        const pageId = pageName === 'configs' ? 'config' : 
+                      pageName === 'details' ? 'details' : pageName;
         const targetPage = document.getElementById(`${pageId}-page`);
         if (targetPage) {
             targetPage.classList.remove('hidden');
@@ -296,6 +299,36 @@ class AppRenderer {
         window.electronAPI.onNavigateToPage((pageName) => {
             this.navigateToPage(pageName);
         });
+    }
+
+    setupThemeSelector() {
+        const themeSelect = document.getElementById('theme-select');
+        if (themeSelect) {
+            // Load saved theme preference from settings
+            const savedTheme = this.settings.appearance?.theme || 'dark';
+            themeSelect.value = savedTheme;
+            this.applyTheme(savedTheme);
+
+            // Handle theme changes
+            themeSelect.addEventListener('change', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const selectedTheme = event.target.value;
+                this.applyTheme(selectedTheme);
+                this.updatePendingSetting('appearance.theme', selectedTheme);
+            });
+        }
+
+        // Listen for system theme changes when in auto mode
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addEventListener('change', () => {
+                const currentTheme = this.settings.appearance?.theme || 'dark';
+                if (currentTheme === 'auto') {
+                    this.applyTheme('auto');
+                }
+            });
+        }
     }
 
     setupFontSelector() {
@@ -321,7 +354,7 @@ class AppRenderer {
         const fontSizeSelect = document.getElementById('font-size-select');
         if (fontSizeSelect) {
             // Load saved font size preference from settings
-            const savedFontSize = this.settings.appearance?.fontSize || 'medium';
+            const savedFontSize = this.settings.appearance?.fontSize || 'small';
             fontSizeSelect.value = savedFontSize;
             this.applyFontSize(savedFontSize);
 
@@ -336,9 +369,51 @@ class AppRenderer {
         }
     }
 
-    applyFont(fontFamily) {
+    applyTheme(theme) {
         const root = document.documentElement;
         
+        // Determine the actual theme to apply
+        let actualTheme = theme;
+        if (theme === 'auto') {
+            // Use system preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                actualTheme = 'dark';
+            } else {
+                actualTheme = 'light';
+            }
+        }
+        
+        // Apply theme by setting data attribute on document element
+        document.documentElement.setAttribute('data-theme', actualTheme);
+        
+        // Update CSS custom properties for theme
+        if (actualTheme === 'light') {
+            // Light theme colors
+            root.style.setProperty('--primary-bg', '#ffffff');
+            root.style.setProperty('--secondary-bg', '#f8f9fa');
+            root.style.setProperty('--titlebar-bg', '#f8f9fa');
+            root.style.setProperty('--card-bg', '#ffffff');
+            root.style.setProperty('--text-primary', '#212529');
+            root.style.setProperty('--text-secondary', '#6c757d');
+            root.style.setProperty('--text-muted', '#adb5bd');
+            root.style.setProperty('--border-color', '#dee2e6');
+            root.style.setProperty('--hover-bg', '#e9ecef');
+        } else {
+            // Dark theme (default)
+            root.style.setProperty('--primary-bg', '#1a1a1a');
+            root.style.setProperty('--secondary-bg', '#2d2d30');
+            root.style.setProperty('--titlebar-bg', '#2d2d30');
+            root.style.setProperty('--card-bg', '#2d2d30');
+            root.style.setProperty('--text-primary', '#ffffff');
+            root.style.setProperty('--text-secondary', '#cccccc');
+            root.style.setProperty('--text-muted', '#888888');
+            root.style.setProperty('--border-color', '#3e3e42');
+            root.style.setProperty('--hover-bg', '#404040');
+        }
+    }
+
+    applyFont(fontFamily) {
+        const root = document.documentElement;
         switch (fontFamily) {
             case 'smooch-sans':
                 root.style.setProperty('--font-family', '"Smooch Sans", sans-serif');
@@ -703,7 +778,7 @@ class AppRenderer {
         // Update font size selector
         const fontSizeSelect = document.getElementById('font-size-select');
         if (fontSizeSelect) {
-            const fontSize = this.settings.appearance?.fontSize || 'medium';
+            const fontSize = this.settings.appearance?.fontSize || 'small';
             fontSizeSelect.value = fontSize;
             this.applyFontSize(fontSize);
         }

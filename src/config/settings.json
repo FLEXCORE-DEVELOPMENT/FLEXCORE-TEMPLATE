@@ -2,9 +2,9 @@
   "appearance": {
     "theme": "dark",
     "fontFamily": "inconsolata",
-    "accentColor": "#af52de",
-    "titlebarButtonStyle": "round",
-    "fontSize": "small"
+    "fontSize": "small",
+    "accentColor": "#ff3b30",
+    "titlebarButtonStyle": "square"
   },
   "behavior": {
     "defaultWindowState": "normal",

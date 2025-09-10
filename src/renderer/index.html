@@ -51,15 +51,9 @@
         <nav class="menu-nav">
             <ul class="menu-list menu-list-top">
                 <li class="menu-item">
-                    <button type="button" class="menu-link">
+                    <button type="button" class="menu-link active">
                         <i class="fas fa-home"></i>
                         <span>Home</span>
-                    </button>
-                </li>
-                <li class="menu-item">
-                    <button type="button" class="menu-link">
-                        <i class="fas fa-info-circle"></i>
-                        <span>About</span>
                     </button>
                 </li>
             </ul>
@@ -67,7 +61,13 @@
                 <li class="menu-item">
                     <button type="button" class="menu-link">
                         <i class="fas fa-cog"></i>
-                        <span>Settings</span>
+                        <span>Configs</span>
+                    </button>
+                </li>
+                <li class="menu-item">
+                    <button type="button" class="menu-link">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Details</span>
                     </button>
                 </li>
             </ul>
@@ -133,7 +133,7 @@
                             <h3><i class="fas fa-paint-brush"></i> Appearance</h3>
                             <div class="config-item">
                                 <label>Theme</label>
-                                <select class="config-select">
+                                <select class="config-select" id="theme-select">
                                     <option value="dark">Dark</option>
                                     <option value="light">Light</option>
                                     <option value="auto">Auto</option>
@@ -179,49 +179,51 @@
                         <div class="config-section">
                             <h3><i class="fas fa-cogs"></i> Behavior</h3>
                             <div class="config-item">
-                                <label>Default window state</label>
-                                <select class="config-select" id="window-state-select">
-                                    <option value="normal">Normal</option>
-                                    <option value="maximized">Maximized</option>
-                                    <option value="minimized">Minimized</option>
-                                </select>
+                                <label>Window Settings</label>
+                                <div class="config-item">
+                                    <label>
+                                        <input type="checkbox" class="config-checkbox" id="remember-window-size" checked>
+                                        Remember window size
+                                    </label>
+                                </div>
+                                <div class="config-item">
+                                    <label>
+                                        <input type="checkbox" class="config-checkbox" id="always-on-top">
+                                        Always on top
+                                    </label>
+                                </div>
                             </div>
                             <div class="config-separator"></div>
                             <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox" id="remember-window-size" checked>
-                                    Remember window size
-                                </label>
+                                <label>Startup & System</label>
+                                <div class="config-item">
+                                    <label>
+                                        <input type="checkbox" class="config-checkbox" id="launch-on-startup">
+                                        Launch on system startup
+                                    </label>
+                                </div>
+                                <div class="config-item">
+                                    <label>
+                                        <input type="checkbox" class="config-checkbox" id="start-minimized-to-tray">
+                                        Start minimized to tray
+                                    </label>
+                                </div>
                             </div>
+                            <div class="config-separator"></div>
                             <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox" id="launch-on-startup">
-                                    Launch on system startup
-                                </label>
-                            </div>
-                            <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox" id="start-minimized-to-tray">
-                                    Start minimized to tray
-                                </label>
-                            </div>
-                            <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox" id="minimize-to-tray">
-                                    Minimize to tray
-                                </label>
-                            </div>
-                            <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox" id="close-to-tray">
-                                    Close to tray
-                                </label>
-                            </div>
-                            <div class="config-item">
-                                <label>
-                                    <input type="checkbox" class="config-checkbox" id="always-on-top">
-                                    Always on top
-                                </label>
+                                <label>Tray Behavior</label>
+                                <div class="config-item">
+                                    <label>
+                                        <input type="checkbox" class="config-checkbox" id="minimize-to-tray">
+                                        Minimize to tray
+                                    </label>
+                                </div>
+                                <div class="config-item">
+                                    <label>
+                                        <input type="checkbox" class="config-checkbox" id="close-to-tray">
+                                        Close to tray
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -256,19 +258,28 @@
 
                         <div class="config-section">
                             <h3><i class="fas fa-cogs"></i> Actions</h3>
-                            <div class="config-actions">
-                                <button class="config-button config-button-primary" id="save-settings-btn">
-                                    <i class="fas fa-save"></i>
-                                    Save Settings
-                                </button>
-                                <button class="config-button config-button-secondary" id="restore-defaults-btn">
-                                    <i class="fas fa-undo"></i>
-                                    Restore to Default
-                                </button>
-                                <button class="config-button config-button-secondary" id="export-settings-btn">
-                                    <i class="fas fa-download"></i>
-                                    Export Settings
-                                </button>
+                            <div class="config-item">
+                                <label>Save & Restore</label>
+                                <div class="config-actions">
+                                    <button class="config-button config-button-primary" id="save-settings-btn">
+                                        <i class="fas fa-save"></i>
+                                        Save Settings
+                                    </button>
+                                    <button class="config-button config-button-secondary" id="restore-defaults-btn">
+                                        <i class="fas fa-undo"></i>
+                                        Restore to Default
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="config-separator"></div>
+                            <div class="config-item">
+                                <label>Export</label>
+                                <div class="config-actions">
+                                    <button class="config-button config-button-secondary" id="export-settings-btn">
+                                        <i class="fas fa-download"></i>
+                                        Export Settings
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -276,11 +287,11 @@
                 </main>
             </div>
 
-            <!-- About Page -->
-            <div class="page hidden" id="about-page">
+            <!-- Details Page -->
+            <div class="page hidden" id="details-page">
                 <header class="app-header">
                     <h1 class="app-title">
-                        About FlexCore
+                        Details FlexCore
                     </h1>
                     <p class="app-subtitle">Application Information</p>
                 </header>

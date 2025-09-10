@@ -1,14 +1,15 @@
-// Color Variables
-$primary-bg: #1a1a1a;
-$secondary-bg: #2d2d30;
-$titlebar-bg: #2d2d30;
-$card-bg: #2d2d30;
-$border-color: #3e3e42;
+// Color Variables - Using CSS custom properties for theme switching
+$primary-bg: var(--primary-bg, #1a1a1a);
+$secondary-bg: var(--secondary-bg, #2d2d30);
+$titlebar-bg: var(--titlebar-bg, #2d2d30);
+$card-bg: var(--card-bg, #2d2d30);
+$border-color: var(--border-color, #3e3e42);
 $accent-color: var(--accent-color, #00a2ff);
 $accent-light: var(--accent-light, #4db8ff);
-$text-primary: #ffffff;
-$text-secondary: #cccccc;
-$text-muted: #888888;
+$text-primary: var(--text-primary, #ffffff);
+$text-secondary: var(--text-secondary, #cccccc);
+$text-muted: var(--text-muted, #888888);
+$hover-bg: var(--hover-bg, #404040);
 
 // Spacing Variables
 $spacing-xs: 4px;

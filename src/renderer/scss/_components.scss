@@ -95,6 +95,12 @@
   display: flex;
   gap: $spacing-md;
   flex-wrap: wrap;
+  
+  .config-button {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+  }
 }
 
 .config-button {
@@ -148,7 +154,7 @@
   }
 }
 
-// About Page Styles
+// Details Page Styles
 .about-content {
   max-width: 600px;
   width: 100%;
@@ -405,7 +411,7 @@
   &:focus {
     outline: none;
     border-color: $accent-color;
-    background: color.adjust($primary-bg, $lightness: 5%);
+    background: $hover-bg;
   }
   
   &:hover {
@@ -414,7 +420,7 @@
   
   &.recording {
     border-color: $accent-color;
-    background: color.adjust($primary-bg, $lightness: 5%);
+    background: $hover-bg;
     animation: pulse 1s infinite;
   }
 }

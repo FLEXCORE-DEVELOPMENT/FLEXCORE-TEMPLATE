@@ -184,7 +184,7 @@ class MainWindow {
         appearance: {
           theme: "dark",
           fontFamily: "inconsolata",
-          fontSize: "medium",
+          fontSize: "small",
           accentColor: "#28ca42",
           titlebarButtonStyle: "square"
         },
