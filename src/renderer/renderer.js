@@ -7,6 +7,7 @@ class AppRenderer {
     }
 
     async init() {
+        this.settings = await window.electronAPI.getSettings();
         this.setupWindowControls();
         this.setupWindowStateListeners();
         this.setupAppInteractions();
@@ -14,6 +15,8 @@ class AppRenderer {
         this.setupTrayNavigation();
         this.setupFontSelector();
         this.setupButtonStyleSelector();
+        this.setupAccentColorSelector();
+        this.setupBehaviorSettings();
         await this.updateMaximizeButton();
     }
 
@@ -98,6 +101,22 @@ class AppRenderer {
     setupAppInteractions() {
         // Add feature card interactions
         this.setupFeatureCards();
+        
+        // Prevent form submissions from navigating away
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+            });
+        });
+        
+        // Prevent default behavior on config inputs
+        const configInputs = document.querySelectorAll('.config-select, .config-checkbox');
+        configInputs.forEach(input => {
+            input.addEventListener('change', (event) => {
+                event.stopPropagation();
+            });
+        });
     }
 
     setupFeatureCards() {
@@ -270,16 +289,18 @@ class AppRenderer {
     setupFontSelector() {
         const fontSelect = document.getElementById('font-select');
         if (fontSelect) {
-            // Load saved font preference
-            const savedFont = localStorage.getItem('selectedFont') || 'smooch-sans';
+            // Load saved font preference from settings
+            const savedFont = this.settings.appearance?.fontFamily || 'smooch-sans';
             fontSelect.value = savedFont;
             this.applyFont(savedFont);
 
             // Handle font changes
-            fontSelect.addEventListener('change', (event) => {
+            fontSelect.addEventListener('change', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
                 const selectedFont = event.target.value;
                 this.applyFont(selectedFont);
-                localStorage.setItem('selectedFont', selectedFont);
+                await window.electronAPI.saveSetting('appearance.fontFamily', selectedFont);
             });
         }
     }
@@ -302,16 +323,18 @@ class AppRenderer {
     setupButtonStyleSelector() {
         const buttonStyleSelect = document.getElementById('button-style-select');
         if (buttonStyleSelect) {
-            // Load saved button style preference
-            const savedStyle = localStorage.getItem('buttonStyle') || 'round';
+            // Load saved button style preference from settings
+            const savedStyle = this.settings.appearance?.titlebarButtonStyle || 'round';
             buttonStyleSelect.value = savedStyle;
             this.applyButtonStyle(savedStyle);
 
             // Handle button style changes
-            buttonStyleSelect.addEventListener('change', (event) => {
+            buttonStyleSelect.addEventListener('change', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
                 const selectedStyle = event.target.value;
                 this.applyButtonStyle(selectedStyle);
-                localStorage.setItem('buttonStyle', selectedStyle);
+                await window.electronAPI.saveSetting('appearance.titlebarButtonStyle', selectedStyle);
             });
         }
     }
@@ -324,6 +347,100 @@ class AppRenderer {
                 button.classList.add('square-style');
             } else {
                 button.classList.remove('square-style');
+            }
+        });
+    }
+
+    setupAccentColorSelector() {
+        const accentColorSelect = document.getElementById('accent-color-select');
+        if (accentColorSelect) {
+            // Load saved accent color preference from settings
+            const savedColor = this.settings.appearance?.accentColor || '#00a2ff';
+            accentColorSelect.value = savedColor;
+            this.applyAccentColor(savedColor);
+
+            // Handle accent color changes
+            accentColorSelect.addEventListener('change', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const selectedColor = event.target.value;
+                this.applyAccentColor(selectedColor);
+                await window.electronAPI.saveSetting('appearance.accentColor', selectedColor);
+            });
+        }
+    }
+
+    applyAccentColor(color) {
+        const root = document.documentElement;
+        root.style.setProperty('--accent-color', color);
+        
+        // Update accent-light (lighter version for hover states)
+        const lightColor = this.lightenColor(color, 20);
+        root.style.setProperty('--accent-light', lightColor);
+        
+        // Update color preview square
+        const colorPreview = document.getElementById('color-preview');
+        if (colorPreview) {
+            colorPreview.style.backgroundColor = color;
+        }
+    }
+
+    lightenColor(color, percent) {
+        // Convert hex to RGB
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        
+        // Lighten each component
+        const newR = Math.min(255, Math.floor(r + (255 - r) * percent / 100));
+        const newG = Math.min(255, Math.floor(g + (255 - g) * percent / 100));
+        const newB = Math.min(255, Math.floor(b + (255 - b) * percent / 100));
+        
+        // Convert back to hex
+        return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    }
+
+    setupBehaviorSettings() {
+        // Default window state dropdown
+        const windowStateSelect = document.getElementById('window-state-select');
+        if (windowStateSelect) {
+            const savedState = this.settings.behavior?.defaultWindowState || 'normal';
+            windowStateSelect.value = savedState;
+            
+            windowStateSelect.addEventListener('change', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const selectedState = event.target.value;
+                await window.electronAPI.saveSetting('behavior.defaultWindowState', selectedState);
+            });
+        }
+
+        // Behavior checkboxes
+        const behaviorSettings = [
+            { id: 'remember-window-size', key: 'behavior.rememberWindowSize' },
+            { id: 'launch-on-startup', key: 'behavior.launchOnStartup' },
+            { id: 'start-minimized-to-tray', key: 'behavior.startMinimizedToTray' },
+            { id: 'minimize-to-tray', key: 'behavior.minimizeToTray' },
+            { id: 'close-to-tray', key: 'behavior.closeToTray' },
+            { id: 'always-on-top', key: 'behavior.alwaysOnTop' }
+        ];
+
+        behaviorSettings.forEach(setting => {
+            const checkbox = document.getElementById(setting.id);
+            if (checkbox) {
+                // Load saved value
+                const keyParts = setting.key.split('.');
+                const savedValue = this.settings[keyParts[0]]?.[keyParts[1]] || false;
+                checkbox.checked = savedValue;
+
+                // Add event listener with proper event handling
+                checkbox.addEventListener('change', async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const isChecked = event.target.checked;
+                    await window.electronAPI.saveSetting(setting.key, isChecked);
+                });
             }
         });
     }

@@ -1,5 +1,6 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
+const { app, BrowserWindow, Menu, Tray, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 // Enable live reload for development
 if (process.argv.includes('--dev')) {
@@ -22,9 +23,58 @@ class MainWindow {
   constructor() {
     this.window = null;
     this.tray = null;
+    this.settingsPath = path.join(__dirname, '../config/settings.json');
+    this.settings = this.loadSettings();
     this.createWindow();
     this.createTray();
     this.setupEventHandlers();
+  }
+
+  loadSettings() {
+    try {
+      if (fs.existsSync(this.settingsPath)) {
+        return JSON.parse(fs.readFileSync(this.settingsPath, 'utf8'));
+      }
+    } catch (err) {
+      console.error('Error loading settings:', err);
+    }
+    
+    // Return default settings if file doesn't exist or error occurs
+    return {
+      appearance: {
+        theme: "dark",
+        fontFamily: "smooch-sans",
+        accentColor: "#00a2ff",
+        titlebarButtonStyle: "round"
+      },
+      behavior: {
+        defaultWindowState: "normal",
+        rememberWindowSize: true,
+        launchOnStartup: false,
+        startMinimizedToTray: false,
+        minimizeToTray: false,
+        closeToTray: false,
+        alwaysOnTop: false
+      },
+      window: {
+        width: 1200,
+        height: 800,
+        x: null,
+        y: null
+      }
+    };
+  }
+
+  saveSettings() {
+    try {
+      const dir = path.dirname(this.settingsPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(this.settingsPath, JSON.stringify(this.settings, null, 2));
+    } catch (err) {
+      console.error('Error saving settings:', err);
+    }
   }
 
   createWindow() {
@@ -100,6 +150,33 @@ class MainWindow {
       return this.window ? this.window.isMaximized() : false;
     });
 
+    // Settings IPC handlers
+    ipcMain.handle('get-settings', () => {
+      return this.settings;
+    });
+
+    ipcMain.handle('save-setting', (event, key, value) => {
+      const keys = key.split('.');
+      let current = this.settings;
+      
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]]) {
+          current[keys[i]] = {};
+        }
+        current = current[keys[i]];
+      }
+      
+      current[keys[keys.length - 1]] = value;
+      this.saveSettings();
+      return true;
+    });
+
+    ipcMain.handle('navigate-to-page', (event, pageName) => {
+      if (this.window) {
+        this.window.webContents.send('navigate-to-page', pageName);
+      }
+    });
+
     // Handle maximize/unmaximize events to update UI
     if (this.window) {
       this.window.on('maximize', () => {
@@ -162,7 +239,7 @@ class MainWindow {
         click: () => {
           this.window.show();
           this.window.focus();
-          this.window.webContents.send('navigate-to-page', 'config');
+          this.window.webContents.send('navigate-to-page', 'settings');
           setTimeout(() => this.updateTrayMenu(), 100);
         }
       },

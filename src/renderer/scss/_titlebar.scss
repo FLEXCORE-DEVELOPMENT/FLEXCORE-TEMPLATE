@@ -264,6 +264,12 @@
   padding: $spacing-md $spacing-lg;
   color: $text-secondary;
   text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
   transition: all $transition-fast;
   font-size: $font-size-base;
   position: relative;

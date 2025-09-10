@@ -1,0 +1,23 @@
+{
+  "appearance": {
+    "theme": "dark",
+    "fontFamily": "inconsolata",
+    "accentColor": "#ff6b35",
+    "titlebarButtonStyle": "square"
+  },
+  "behavior": {
+    "defaultWindowState": "normal",
+    "rememberWindowSize": true,
+    "launchOnStartup": false,
+    "startMinimizedToTray": false,
+    "minimizeToTray": false,
+    "closeToTray": false,
+    "alwaysOnTop": false
+  },
+  "window": {
+    "width": 1200,
+    "height": 800,
+    "x": null,
+    "y": null
+  }
+}

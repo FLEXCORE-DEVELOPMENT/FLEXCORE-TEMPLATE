@@ -51,24 +51,24 @@
         <nav class="menu-nav">
             <ul class="menu-list menu-list-top">
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <button type="button" class="menu-link">
                         <i class="fas fa-home"></i>
                         <span>Home</span>
-                    </a>
+                    </button>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <button type="button" class="menu-link">
                         <i class="fas fa-info-circle"></i>
                         <span>About</span>
-                    </a>
+                    </button>
                 </li>
             </ul>
             <ul class="menu-list menu-list-bottom">
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <button type="button" class="menu-link">
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
-                    </a>
+                    </button>
                 </li>
             </ul>
         </nav>
@@ -148,12 +148,17 @@
                             </div>
                             <div class="config-item">
                                 <label>Accent Color</label>
-                                <input type="color" class="config-color" value="#00a2ff">
+                                <div class="config-color-wrapper">
+                                    <select class="config-select" id="accent-color-select">
+                                        <option value="#00a2ff">Blue</option>
+                                        <option value="#ff6b35">Orange</option>
+                                        <option value="#28ca42">Green</option>
+                                        <option value="#ff3b30">Red</option>
+                                        <option value="#af52de">Purple</option>
+                                    </select>
+                                    <div class="color-preview" id="color-preview"></div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="config-section">
-                            <h3><i class="fas fa-window-maximize"></i> Window</h3>
                             <div class="config-item">
                                 <label>Titlebar Button Style</label>
                                 <select class="config-select" id="button-style-select">
@@ -161,16 +166,53 @@
                                     <option value="square">Square Buttons</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="config-section">
+                            <h3><i class="fas fa-cogs"></i> Behavior</h3>
+                            <div class="config-item">
+                                <label>Default window state</label>
+                                <select class="config-select" id="window-state-select">
+                                    <option value="normal">Normal</option>
+                                    <option value="maximized">Maximized</option>
+                                    <option value="minimized">Minimized</option>
+                                </select>
+                            </div>
+                            <div class="config-separator"></div>
                             <div class="config-item">
                                 <label>
-                                    <input type="checkbox" class="config-checkbox" checked>
+                                    <input type="checkbox" class="config-checkbox" id="remember-window-size" checked>
                                     Remember window size
                                 </label>
                             </div>
                             <div class="config-item">
                                 <label>
-                                    <input type="checkbox" class="config-checkbox">
-                                    Start minimized
+                                    <input type="checkbox" class="config-checkbox" id="launch-on-startup">
+                                    Launch on system startup
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox" id="start-minimized-to-tray">
+                                    Start minimized to tray
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox" id="minimize-to-tray">
+                                    Minimize to tray
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox" id="close-to-tray">
+                                    Close to tray
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label>
+                                    <input type="checkbox" class="config-checkbox" id="always-on-top">
+                                    Always on top
                                 </label>
                             </div>
                         </div>
