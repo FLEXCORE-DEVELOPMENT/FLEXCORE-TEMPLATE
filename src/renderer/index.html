@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
+    <title>FlexCore App</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Custom Titlebar -->
+    <div class="titlebar">
+        <div class="titlebar-drag-region">
+            <div class="titlebar-content">
+                <div class="titlebar-title">
+                    <span class="app-icon">#</span>
+                    <span class="app-name">FLEXCORE APP</span>
+                </div>
+            </div>
+        </div>
+        <div class="titlebar-controls">
+            <button class="titlebar-button minimize-button" id="minimize-btn" title="Minimize">
+                <svg width="12" height="12" viewBox="0 0 12 12">
+                    <rect x="0" y="5" width="12" height="2" fill="currentColor"/>
+                </svg>
+            </button>
+            <button class="titlebar-button maximize-button" id="maximize-btn" title="Maximize">
+                <svg width="12" height="12" viewBox="0 0 12 12">
+                    <rect x="0" y="0" width="12" height="12" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+            </button>
+            <button class="titlebar-button close-button" id="close-btn" title="Close">
+                <svg width="12" height="12" viewBox="0 0 12 12">
+                    <path d="M0 0 L12 12 M12 0 L0 12" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="container">
+            <header class="app-header">
+                <h1 class="app-title">
+                    <span class="hash">#</span>FLEXCORE
+                </h1>
+                <p class="app-subtitle">Modern Electron Application</p>
+            </header>
+
+            <main class="content-area">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <div class="icon-placeholder"></div>
+                        </div>
+                        <h3>Modern UI</h3>
+                        <p>Clean and modern interface with custom titlebar</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <div class="icon-placeholder"></div>
+                        </div>
+                        <h3>Secure</h3>
+                        <p>Built with Electron security best practices</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <div class="icon-placeholder"></div>
+                        </div>
+                        <h3>Cross-Platform</h3>
+                        <p>Works on Windows, macOS, and Linux</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="primary-button">Get Started</button>
+                    <button class="secondary-button">Learn More</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

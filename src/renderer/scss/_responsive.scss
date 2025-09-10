@@ -1,0 +1,26 @@
+// Responsive Design
+@media (max-width: $breakpoint-mobile) {
+  .container {
+    padding: $spacing-lg $spacing-md;
+  }
+  
+  .app-title {
+    font-size: $font-size-4xl;
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+    
+    .primary-button,
+    .secondary-button {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+}

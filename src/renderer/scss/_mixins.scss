@@ -1,0 +1,106 @@
+// Button Mixins
+@mixin button-base {
+  border: none;
+  border-radius: $border-radius-md;
+  font-size: $font-size-base;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-normal;
+  padding: 14px 32px;
+  min-width: 140px;
+  
+  &:focus {
+    outline: 2px solid $accent-color;
+    outline-offset: 2px;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: linear-gradient(135deg, $accent-color, $accent-light);
+  color: $text-primary;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba($accent-color, 0.4);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: transparent;
+  color: $text-secondary;
+  border: 2px solid $border-color;
+  
+  &:hover {
+    border-color: $accent-color;
+    color: $accent-color;
+    transform: translateY(-2px);
+  }
+}
+
+// Card Mixins
+@mixin card-base {
+  background: rgba($secondary-bg, 0.6);
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  backdrop-filter: blur(10px);
+  transition: all $transition-normal;
+}
+
+@mixin card-hover {
+  &:hover {
+    transform: translateY(-5px);
+    border-color: $accent-color;
+    box-shadow: 0 10px 30px rgba($accent-color, 0.2);
+  }
+}
+
+// Flex Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Gradient Mixins
+@mixin gradient-bg {
+  background: linear-gradient(135deg, $primary-bg 0%, $secondary-bg 100%);
+}
+
+@mixin gradient-accent {
+  background: linear-gradient(135deg, $accent-color, $accent-light);
+}
+
+// Animation Mixins
+@mixin fade-in($delay: 0s) {
+  animation: fadeIn $transition-slow;
+  animation-delay: $delay;
+  animation-fill-mode: both;
+}
+
+// Scrollbar Mixins
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $secondary-bg;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #555555;
+    border-radius: $border-radius-sm;
+    
+    &:hover {
+      background: #666666;
+    }
+  }
+}

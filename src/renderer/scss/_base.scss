@@ -1,0 +1,28 @@
+// Reset and Base Styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+  @include gradient-bg;
+  color: $text-primary;
+  overflow: hidden;
+  height: 100vh;
+  user-select: none;
+  @include custom-scrollbar;
+}
+
+// Keyframes
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

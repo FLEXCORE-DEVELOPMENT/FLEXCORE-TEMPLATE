@@ -1,0 +1,74 @@
+// Custom Titlebar Styles
+.titlebar {
+  display: flex;
+  height: $titlebar-height;
+  background: $titlebar-bg;
+  border-bottom: 1px solid $border-color;
+  position: relative;
+  z-index: $z-titlebar;
+}
+
+.titlebar-drag-region {
+  flex: 1;
+  -webkit-app-region: drag;
+  @include flex-center;
+  padding: 0 $spacing-md;
+}
+
+.titlebar-content {
+  @include flex-center;
+  width: 100%;
+}
+
+.titlebar-title {
+  @include flex-center;
+  gap: $spacing-sm;
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-secondary;
+}
+
+.app-icon {
+  color: $accent-color;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.app-name {
+  letter-spacing: 0.5px;
+}
+
+.titlebar-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-button {
+  width: 46px;
+  height: $titlebar-height;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  cursor: pointer;
+  @include flex-center;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: 2px solid $accent-color;
+    outline-offset: 2px;
+  }
+}
+
+.close-button:hover {
+  background: #e81123;
+  color: white;
+}
+
+.maximize-button.maximized svg {
+  transform: scale(0.9);
+}
