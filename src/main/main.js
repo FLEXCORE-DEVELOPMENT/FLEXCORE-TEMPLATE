@@ -63,10 +63,8 @@ class MainWindow {
       this.window = null;
     });
 
-    // Open DevTools in development
-    if (process.argv.includes('--dev')) {
-      this.window.webContents.openDevTools();
-    }
+    // DevTools can be opened manually with Ctrl+Shift+I or F12 in development
+    // Removed automatic opening to keep the interface clean
   }
 
   setupEventHandlers() {

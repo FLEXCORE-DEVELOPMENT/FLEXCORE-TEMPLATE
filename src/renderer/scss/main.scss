@@ -1,8 +1,8 @@
-// Main SCSS file - imports all partials
-@import 'variables';
-@import 'mixins';
-@import 'base';
-@import 'titlebar';
-@import 'layout';
-@import 'components';
-@import 'responsive';
+// Main SCSS file - uses modern @use syntax
+@use 'variables' as *;
+@use 'mixins' as *;
+@use 'base';
+@use 'titlebar';
+@use 'layout';
+@use 'components';
+@use 'responsive';
