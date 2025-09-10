@@ -43,36 +43,84 @@
 
 .titlebar-controls {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
   -webkit-app-region: no-drag;
 }
 
-.titlebar-button {
-  width: 46px;
-  height: $titlebar-height;
+// Mac-style round buttons
+.mac-button {
+  position: relative;
+  width: 12px;
+  height: 12px;
   border: none;
-  background: transparent;
-  color: $text-secondary;
+  border-radius: 50%;
   cursor: pointer;
   font-family: $font-family;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   @include flex-center;
-  transition: background-color $transition-fast;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.05);
+  
+  // Button dot (always visible)
+  .button-dot {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
+  
+  &:hover {
+    transform: scale(1.15);
+    
+    .button-dot {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  &:active {
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+  }
+  
   &:focus {
-    outline: 2px solid $accent-color;
+    outline: 1px solid rgba(255, 255, 255, 0.3);
     outline-offset: 2px;
   }
 }
 
-.close-button:hover {
-  background: #e81123;
-  color: white;
+// Close button (red)
+.close-button {
+  .button-dot {
+    background: #ff5f57;
+  }
+  
+  &:hover .button-dot {
+    background: #ff3b30;
+    box-shadow: 0 0 12px rgba(255, 59, 48, 0.4);
+  }
 }
 
-.maximize-button.maximized svg {
-  transform: scale(0.9);
+// Minimize button (yellow)
+.minimize-button {
+  .button-dot {
+    background: #ffbd2e;
+  }
+  
+  &:hover .button-dot {
+    background: #ff9500;
+    box-shadow: 0 0 12px rgba(255, 149, 0, 0.4);
+  }
+}
+
+// Maximize button (green)
+.maximize-button {
+  .button-dot {
+    background: #28ca42;
+  }
+  
+  &:hover .button-dot {
+    background: #30d158;
+    box-shadow: 0 0 12px rgba(48, 209, 88, 0.4);
+  }
 }
