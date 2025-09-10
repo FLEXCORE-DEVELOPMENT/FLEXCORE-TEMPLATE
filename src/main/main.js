@@ -29,6 +29,7 @@ class MainWindow {
     this.createWindow();
     this.setupEventHandlers();
     this.registerGlobalShortcuts();
+    this.setupAutoLaunch();
   }
 
   loadSettings() {
@@ -79,16 +80,17 @@ class MainWindow {
   }
 
   createWindow() {
-    // Create the browser window with frameless configuration
-    this.window = new BrowserWindow({
-      width: 1200,
-      height: 800,
+    // Use saved window size if remember window size is enabled
+    const windowConfig = {
+      width: this.settings.behavior?.rememberWindowSize && this.settings.window?.width ? this.settings.window.width : 1200,
+      height: this.settings.behavior?.rememberWindowSize && this.settings.window?.height ? this.settings.window.height : 800,
       minWidth: 800,
       minHeight: 600,
       frame: false, // Frameless window
       titleBarStyle: 'hidden',
       backgroundColor: '#1a1a1a', // Dark background matching theme
-      show: false, // Don't show until ready
+      show: !this.settings.behavior?.startMinimizedToTray, // Don't show if starting minimized to tray
+      alwaysOnTop: this.settings.behavior?.alwaysOnTop || false, // Apply always on top setting
       webPreferences: {
         nodeIntegration: false, // Security: disable node integration
         contextIsolation: true, // Security: enable context isolation
@@ -99,18 +101,52 @@ class MainWindow {
         experimentalFeatures: false // Security: disable experimental features
       },
       icon: path.join(__dirname, '../../assets/favicon.ico')
-    });
+    };
+
+    // Set window position if remembered
+    if (this.settings.behavior?.rememberWindowSize && this.settings.window?.x !== null && this.settings.window?.y !== null) {
+      windowConfig.x = this.settings.window.x;
+      windowConfig.y = this.settings.window.y;
+    }
+
+    // Create the browser window with frameless configuration
+    this.window = new BrowserWindow(windowConfig);
 
     // Load the app
     this.window.loadFile(path.join(__dirname, '../renderer/index.html'));
 
     // Show window when ready to prevent visual flash
     this.window.once('ready-to-show', () => {
-      this.window.show();
-      
-      // Focus the window
-      if (this.window) {
-        this.window.focus();
+      if (this.settings.behavior?.startMinimizedToTray) {
+        // Create tray and minimize to it if setting is enabled
+        this.createTray();
+        this.window.hide();
+      } else {
+        this.window.show();
+        
+        // Focus the window
+        if (this.window) {
+          this.window.focus();
+        }
+      }
+    });
+
+    // Handle window minimize event
+    this.window.on('minimize', () => {
+      if (this.settings.behavior?.minimizeToTray) {
+        // Create tray if it doesn't exist and hide window instead of minimizing
+        this.createTray();
+        this.window.hide();
+      }
+    });
+
+    // Handle window close event
+    this.window.on('close', (event) => {
+      if (this.settings.behavior?.closeToTray) {
+        // Prevent the window from closing and hide it instead
+        event.preventDefault();
+        this.createTray();
+        this.window.hide();
       }
     });
 
@@ -119,15 +155,126 @@ class MainWindow {
       this.window = null;
     });
 
+    // Save window size and position when window is resized or moved (if remember window size is enabled)
+    this.window.on('resize', () => {
+      if (this.settings.behavior?.rememberWindowSize && this.window && !this.window.isDestroyed()) {
+        const bounds = this.window.getBounds();
+        this.settings.window = {
+          ...this.settings.window,
+          width: bounds.width,
+          height: bounds.height
+        };
+        this.saveSettings();
+      }
+    });
+
+    this.window.on('move', () => {
+      if (this.settings.behavior?.rememberWindowSize && this.window && !this.window.isDestroyed()) {
+        const bounds = this.window.getBounds();
+        this.settings.window = {
+          ...this.settings.window,
+          x: bounds.x,
+          y: bounds.y
+        };
+        this.saveSettings();
+      }
+    });
+
     // DevTools can be opened manually with Ctrl+Shift+I or F12 in development
     // Removed automatic opening to keep the interface clean
+  }
+
+  setupAutoLaunch() {
+    // Set auto launch based on current setting
+    this.setAutoLaunch(this.settings.behavior?.launchOnStartup || false);
+  }
+
+  setAutoLaunch(enabled) {
+    try {
+      if (enabled) {
+        app.setLoginItemSettings({
+          openAtLogin: true,
+          path: process.execPath,
+          args: []
+        });
+      } else {
+        app.setLoginItemSettings({
+          openAtLogin: false
+        });
+      }
+    } catch (error) {
+      console.error('Error setting auto launch:', error);
+    }
+  }
+
+  createTray() {
+    if (this.tray) return; // Tray already exists
+
+    try {
+      // Create tray icon
+      const trayIconPath = path.join(__dirname, '../../assets/favicon.ico');
+      this.tray = new Tray(trayIconPath);
+      
+      // Set tray tooltip
+      this.tray.setToolTip('FlexCore Template');
+      
+      // Create tray context menu
+      const contextMenu = Menu.buildFromTemplate([
+        {
+          label: 'Show Window',
+          click: () => {
+            if (this.window) {
+              this.window.show();
+              this.window.focus();
+            }
+          }
+        },
+        {
+          label: 'Hide Window',
+          click: () => {
+            if (this.window) {
+              this.window.hide();
+            }
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Quit',
+          click: () => {
+            app.quit();
+          }
+        }
+      ]);
+      
+      this.tray.setContextMenu(contextMenu);
+      
+      // Handle tray click to show/hide window
+      this.tray.on('click', () => {
+        if (this.window) {
+          if (this.window.isVisible()) {
+            this.window.hide();
+          } else {
+            this.window.show();
+            this.window.focus();
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error creating tray:', error);
+    }
   }
 
   setupEventHandlers() {
     // IPC handlers for window controls
     ipcMain.handle('window-minimize', () => {
       if (this.window) {
-        this.window.minimize();
+        if (this.settings.behavior?.minimizeToTray) {
+          // Create tray if it doesn't exist and hide window
+          this.createTray();
+          this.window.hide();
+        } else {
+          this.window.minimize();
+        }
       }
     });
 
@@ -143,7 +290,13 @@ class MainWindow {
 
     ipcMain.handle('window-close', () => {
       if (this.window) {
-        this.window.close();
+        if (this.settings.behavior?.closeToTray) {
+          // Create tray if it doesn't exist and hide window
+          this.createTray();
+          this.window.hide();
+        } else {
+          this.window.close();
+        }
       }
     });
 
@@ -168,6 +321,14 @@ class MainWindow {
       }
       
       current[keys[keys.length - 1]] = value;
+      
+      // Apply settings immediately for certain keys
+      if (key === 'behavior.alwaysOnTop' && this.window) {
+        this.window.setAlwaysOnTop(value);
+      } else if (key === 'behavior.launchOnStartup') {
+        this.setAutoLaunch(value);
+      }
+      
       this.saveSettings();
       return true;
     });
@@ -302,27 +463,6 @@ class MainWindow {
         label: 'FLEXCORE TEMPLATE',
         enabled: false,
         type: 'normal'
-      },
-      { type: 'separator' },
-      {
-        label: 'SETTINGS',
-        accelerator: 'CmdOrCtrl+,',
-        click: () => {
-          this.window.show();
-          this.window.focus();
-          this.window.webContents.send('navigate-to-page', 'settings');
-          setTimeout(() => this.updateTrayMenu(), 100);
-        }
-      },
-      {
-        label: 'ABOUT',
-        accelerator: 'CmdOrCtrl+I',
-        click: () => {
-          this.window.show();
-          this.window.focus();
-          this.window.webContents.send('navigate-to-page', 'about');
-          setTimeout(() => this.updateTrayMenu(), 100);
-        }
       },
       { type: 'separator' },
       // Show 'Show' only when window is hidden

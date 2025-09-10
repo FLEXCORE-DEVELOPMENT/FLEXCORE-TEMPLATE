@@ -31,6 +31,9 @@ class AppRenderer {
         this.applyFontSize(this.settings.appearance?.fontSize || 'small');
         this.applyButtonStyle(this.settings.appearance?.titlebarButtonStyle || 'round');
         this.applyAccentColor(this.settings.appearance?.accentColor || '#00a2ff');
+        
+        // Update OS information on Details page (with delay to ensure DOM is ready)
+        setTimeout(() => this.updateOSInfo(), 500);
     }
 
     setupWindowControls() {
@@ -280,6 +283,11 @@ class AppRenderer {
         const targetPage = document.getElementById(`${pageId}-page`);
         if (targetPage) {
             targetPage.classList.remove('hidden');
+            
+            // Update OS info when navigating to Details page
+            if (pageId === 'details') {
+                setTimeout(() => this.updateOSInfo(), 100);
+            }
         }
 
         // Update active menu item
@@ -858,6 +866,50 @@ class AppRenderer {
         this.pendingSettings = {};
         this.hasUnsavedChanges = false;
         this.updateSaveButtonState();
+    }
+
+    updateOSInfo() {
+        const osInfoElement = document.getElementById('current-os-info');
+        
+        if (osInfoElement) {
+            // Get OS information from navigator
+            const platform = navigator.platform;
+            const userAgent = navigator.userAgent;
+            
+            let osName = 'Unknown';
+            let osVersion = '';
+            
+            if (platform.includes('Win')) {
+                osName = 'Windows';
+                if (userAgent.includes('Windows NT 10.0')) {
+                    osVersion = '10/11';
+                } else if (userAgent.includes('Windows NT 6.3')) {
+                    osVersion = '8.1';
+                } else if (userAgent.includes('Windows NT 6.2')) {
+                    osVersion = '8';
+                } else if (userAgent.includes('Windows NT 6.1')) {
+                    osVersion = '7';
+                }
+            } else if (platform.includes('Mac')) {
+                osName = 'macOS';
+                const macMatch = userAgent.match(/Mac OS X (\d+[._]\d+[._]\d+)/);
+                if (macMatch) {
+                    osVersion = macMatch[1].replace(/_/g, '.');
+                }
+            } else if (platform.includes('Linux')) {
+                osName = 'Linux';
+                osVersion = platform;
+            }
+            
+            const architecture = navigator.userAgent.includes('x64') || navigator.userAgent.includes('WOW64') ? 'x64' : 
+                                navigator.userAgent.includes('ARM64') ? 'ARM64' : 'x86';
+            
+            const osInfo = `Current: ${osName}${osVersion ? ' ' + osVersion : ''} (${architecture})`;
+            osInfoElement.textContent = osInfo;
+        } else {
+            // Retry if element not found
+            setTimeout(() => this.updateOSInfo(), 100);
+        }
     }
 }
 

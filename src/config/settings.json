@@ -9,11 +9,11 @@
   "behavior": {
     "defaultWindowState": "normal",
     "rememberWindowSize": true,
-    "launchOnStartup": false,
+    "launchOnStartup": true,
     "startMinimizedToTray": true,
-    "minimizeToTray": false,
+    "minimizeToTray": true,
     "closeToTray": true,
-    "alwaysOnTop": false
+    "alwaysOnTop": true
   },
   "advanced": {
     "keyboardShortcuts": {
@@ -27,7 +27,7 @@
   "window": {
     "width": 1200,
     "height": 800,
-    "x": null,
-    "y": null
+    "x": 189,
+    "y": 141
   }
 }

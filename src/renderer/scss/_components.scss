@@ -156,69 +156,113 @@
 
 // Details Page Styles
 .about-content {
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
   text-align: center;
 }
 
 .about-section {
-  margin-bottom: $spacing-xxl;
+  @include card-base;
+  padding: $spacing-xxl;
+  margin-bottom: $spacing-xl;
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  position: relative;
+  overflow: hidden;
+  
+  // Subtle gradient overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    @include gradient-accent;
+  }
   
   .app-logo {
-    font-size: 4rem;
+    font-size: 4.5rem;
     color: $accent-color;
     margin-bottom: $spacing-lg;
     
     i {
-      filter: drop-shadow(0 0 20px rgba(0, 162, 255, 0.3));
+      filter: drop-shadow(0 0 30px rgba(157, 78, 221, 0.4));
+      animation: pulse-glow 3s ease-in-out infinite;
     }
   }
   
   h2 {
     color: $text-primary;
     font-size: $font-size-3xl;
-    font-weight: 300;
+    font-weight: 400;
     margin-bottom: $spacing-sm;
+    letter-spacing: 0.5px;
   }
   
   .version {
+    display: inline-block;
     color: $accent-color;
-    font-size: $font-size-lg;
-    font-weight: 500;
+    font-size: $font-size-base;
+    font-weight: 600;
     margin-bottom: $spacing-lg;
+    padding: $spacing-xs $spacing-md;
+    background: rgba(157, 78, 221, 0.1);
+    border: 1px solid rgba(157, 78, 221, 0.3);
+    border-radius: $border-radius-full;
   }
   
   .description {
     color: $text-secondary;
     font-size: $font-size-base;
-    line-height: 1.6;
-    max-width: 500px;
+    line-height: 1.7;
+    max-width: 550px;
     margin: 0 auto;
     text-transform: none;
+    font-weight: 300;
   }
 }
 
 .about-details {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
   margin-bottom: $spacing-xxl;
 }
 
 .detail-item {
+  @include card-base;
+  @include card-hover;
   display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  padding: $spacing-md;
+  align-items: flex-start;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
   background: $card-bg;
   border: 1px solid $border-color;
-  border-radius: $border-radius-md;
+  border-radius: $border-radius-lg;
   text-align: left;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &:hover {
+    border-color: rgba(157, 78, 221, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
   
   i {
     color: $accent-color;
-    font-size: $font-size-lg;
-    width: 20px;
+    font-size: $font-size-xl;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(157, 78, 221, 0.1);
+    border-radius: $border-radius-md;
+    padding: $spacing-sm;
+    margin-top: 2px;
   }
   
   div {
@@ -227,24 +271,54 @@
     strong {
       display: block;
       color: $text-primary;
-      font-size: $font-size-sm;
+      font-size: $font-size-base;
       font-weight: 600;
-      margin-bottom: 2px;
+      margin-bottom: $spacing-xs;
+      letter-spacing: 0.3px;
     }
     
     span {
       color: $text-secondary;
+      font-size: $font-size-sm;
+      line-height: 1.5;
+    }
+  }
+  
+  .platform-info {
+    margin-top: $spacing-xs;
+    
+    small {
+      color: $text-muted;
       font-size: $font-size-xs;
+      font-style: italic;
+      display: block;
+      padding: $spacing-xs 0;
     }
   }
 }
 
 .about-footer {
+  @include card-base;
+  padding: $spacing-lg;
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
   color: $text-muted;
-  font-size: $font-size-xs;
+  font-size: $font-size-sm;
   
   p {
     margin: 0;
+    font-weight: 300;
+  }
+}
+
+// Pulse glow animation for logo
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 30px rgba(157, 78, 221, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 40px rgba(157, 78, 221, 0.6));
   }
 }
 
