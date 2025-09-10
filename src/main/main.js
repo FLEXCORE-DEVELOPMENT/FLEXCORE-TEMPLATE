@@ -25,9 +25,10 @@ class MainWindow {
     this.tray = null;
     this.settingsPath = path.join(__dirname, '../config/settings.json');
     this.settings = this.loadSettings();
+    this.globalShortcuts = new Map();
     this.createWindow();
-    this.createTray();
     this.setupEventHandlers();
+    this.registerGlobalShortcuts();
   }
 
   loadSettings() {
@@ -183,6 +184,7 @@ class MainWindow {
         appearance: {
           theme: "dark",
           fontFamily: "inconsolata",
+          fontSize: "medium",
           accentColor: "#28ca42",
           titlebarButtonStyle: "square"
         },
@@ -194,6 +196,15 @@ class MainWindow {
           minimizeToTray: false,
           closeToTray: true,
           alwaysOnTop: false
+        },
+        advanced: {
+          keyboardShortcuts: {
+            close: "Ctrl+Q",
+            minimize: "Ctrl+M",
+            maximize: "Ctrl+Shift+M",
+            show: "Ctrl+Shift+S",
+            hide: "Ctrl+H"
+          }
         },
         window: {
           width: 1200,
@@ -230,6 +241,11 @@ class MainWindow {
       }
       
       return { success: false, canceled: true };
+    });
+
+    ipcMain.handle('update-global-shortcuts', () => {
+      this.updateGlobalShortcuts();
+      return true;
     });
 
     // Handle maximize/unmaximize events to update UI
@@ -378,3 +394,73 @@ app.on('web-contents-created', (event, contents) => {
     }
   });
 });
+
+// Add global shortcut methods to MainWindow class
+MainWindow.prototype.registerGlobalShortcuts = function() {
+  const { globalShortcut } = require('electron');
+  
+  // Clear existing shortcuts
+  if (this.globalShortcuts) {
+    this.globalShortcuts.forEach((accelerator) => {
+      globalShortcut.unregister(accelerator);
+    });
+    this.globalShortcuts.clear();
+  }
+
+  const shortcuts = this.settings.advanced?.keyboardShortcuts;
+  if (!shortcuts) return;
+
+  // Register shortcuts
+  const shortcutActions = {
+    close: () => {
+      if (this.window) {
+        this.window.close();
+      }
+    },
+    minimize: () => {
+      if (this.window) {
+        this.window.minimize();
+      }
+    },
+    maximize: () => {
+      if (this.window) {
+        if (this.window.isMaximized()) {
+          this.window.unmaximize();
+        } else {
+          this.window.maximize();
+        }
+      }
+    },
+    show: () => {
+      if (this.window) {
+        this.window.show();
+        this.window.focus();
+      }
+    },
+    hide: () => {
+      if (this.window) {
+        this.window.hide();
+      }
+    }
+  };
+
+  Object.entries(shortcuts).forEach(([action, accelerator]) => {
+    if (accelerator && shortcutActions[action]) {
+      try {
+        const success = globalShortcut.register(accelerator, shortcutActions[action]);
+        if (success) {
+          this.globalShortcuts.set(action, accelerator);
+          console.log(`Registered global shortcut: ${accelerator} for ${action}`);
+        } else {
+          console.warn(`Failed to register global shortcut: ${accelerator} for ${action}`);
+        }
+      } catch (error) {
+        console.error(`Error registering shortcut ${accelerator}:`, error);
+      }
+    }
+  });
+};
+
+MainWindow.prototype.updateGlobalShortcuts = function() {
+  this.registerGlobalShortcuts();
+};

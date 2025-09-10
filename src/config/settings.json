@@ -2,8 +2,9 @@
   "appearance": {
     "theme": "dark",
     "fontFamily": "inconsolata",
-    "accentColor": "#28ca42",
-    "titlebarButtonStyle": "square"
+    "accentColor": "#af52de",
+    "titlebarButtonStyle": "round",
+    "fontSize": "small"
   },
   "behavior": {
     "defaultWindowState": "normal",
@@ -13,6 +14,15 @@
     "minimizeToTray": false,
     "closeToTray": true,
     "alwaysOnTop": false
+  },
+  "advanced": {
+    "keyboardShortcuts": {
+      "close": "Ctrl+Q",
+      "minimize": "Ctrl+M",
+      "maximize": "Ctrl+Shift+M",
+      "show": "Ctrl+Shift+S",
+      "hide": "Ctrl+H"
+    }
   },
   "window": {
     "width": 1200,

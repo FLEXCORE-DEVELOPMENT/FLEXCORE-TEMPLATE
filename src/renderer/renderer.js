@@ -3,6 +3,8 @@
 class AppRenderer {
     constructor() {
         this.isMaximized = false;
+        this.hasUnsavedChanges = false;
+        this.pendingSettings = {};
         this.init();
     }
 
@@ -14,14 +16,17 @@ class AppRenderer {
         this.setupMenuControls();
         this.setupTrayNavigation();
         this.setupFontSelector();
+        this.setupFontSizeSelector();
         this.setupButtonStyleSelector();
         this.setupAccentColorSelector();
         this.setupBehaviorSettings();
+        this.setupAdvancedSettings();
         this.setupConfigActions();
         await this.updateMaximizeButton();
         
         // Apply saved settings on startup
         this.applyFont(this.settings.appearance?.fontFamily || 'smooch-sans');
+        this.applyFontSize(this.settings.appearance?.fontSize || 'medium');
         this.applyButtonStyle(this.settings.appearance?.titlebarButtonStyle || 'round');
         this.applyAccentColor(this.settings.appearance?.accentColor || '#00a2ff');
     }
@@ -302,12 +307,31 @@ class AppRenderer {
             this.applyFont(savedFont);
 
             // Handle font changes
-            fontSelect.addEventListener('change', async (event) => {
+            fontSelect.addEventListener('change', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 const selectedFont = event.target.value;
                 this.applyFont(selectedFont);
-                await window.electronAPI.saveSetting('appearance.fontFamily', selectedFont);
+                this.updatePendingSetting('appearance.fontFamily', selectedFont);
+            });
+        }
+    }
+
+    setupFontSizeSelector() {
+        const fontSizeSelect = document.getElementById('font-size-select');
+        if (fontSizeSelect) {
+            // Load saved font size preference from settings
+            const savedFontSize = this.settings.appearance?.fontSize || 'medium';
+            fontSizeSelect.value = savedFontSize;
+            this.applyFontSize(savedFontSize);
+
+            // Handle font size changes
+            fontSizeSelect.addEventListener('change', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const selectedFontSize = event.target.value;
+                this.applyFontSize(selectedFontSize);
+                this.updatePendingSetting('appearance.fontSize', selectedFontSize);
             });
         }
     }
@@ -327,6 +351,24 @@ class AppRenderer {
         }
     }
 
+    applyFontSize(fontSize) {
+        const root = document.documentElement;
+        
+        switch (fontSize) {
+            case 'small':
+                root.style.setProperty('--font-scale', '0.875');
+                break;
+            case 'medium':
+                root.style.setProperty('--font-scale', '1');
+                break;
+            case 'large':
+                root.style.setProperty('--font-scale', '1.125');
+                break;
+            default:
+                root.style.setProperty('--font-scale', '1');
+        }
+    }
+
     setupButtonStyleSelector() {
         const buttonStyleSelect = document.getElementById('button-style-select');
         if (buttonStyleSelect) {
@@ -336,12 +378,12 @@ class AppRenderer {
             this.applyButtonStyle(savedStyle);
 
             // Handle button style changes
-            buttonStyleSelect.addEventListener('change', async (event) => {
+            buttonStyleSelect.addEventListener('change', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 const selectedStyle = event.target.value;
                 this.applyButtonStyle(selectedStyle);
-                await window.electronAPI.saveSetting('appearance.titlebarButtonStyle', selectedStyle);
+                this.updatePendingSetting('appearance.titlebarButtonStyle', selectedStyle);
             });
         }
     }
@@ -367,12 +409,12 @@ class AppRenderer {
             this.applyAccentColor(savedColor);
 
             // Handle accent color changes
-            accentColorSelect.addEventListener('change', async (event) => {
+            accentColorSelect.addEventListener('change', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 const selectedColor = event.target.value;
                 this.applyAccentColor(selectedColor);
-                await window.electronAPI.saveSetting('appearance.accentColor', selectedColor);
+                this.updatePendingSetting('appearance.accentColor', selectedColor);
             });
         }
     }
@@ -415,11 +457,11 @@ class AppRenderer {
             const savedState = this.settings.behavior?.defaultWindowState || 'normal';
             windowStateSelect.value = savedState;
             
-            windowStateSelect.addEventListener('change', async (event) => {
+            windowStateSelect.addEventListener('change', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 const selectedState = event.target.value;
-                await window.electronAPI.saveSetting('behavior.defaultWindowState', selectedState);
+                this.updatePendingSetting('behavior.defaultWindowState', selectedState);
             });
         }
 
@@ -442,17 +484,144 @@ class AppRenderer {
                 checkbox.checked = savedValue;
 
                 // Add event listener with proper event handling
-                checkbox.addEventListener('change', async (event) => {
+                checkbox.addEventListener('change', (event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     const isChecked = event.target.checked;
-                    await window.electronAPI.saveSetting(setting.key, isChecked);
+                    this.updatePendingSetting(setting.key, isChecked);
                 });
             }
         });
     }
 
+    setupAdvancedSettings() {
+        const shortcuts = [
+            { id: 'shortcut-close', key: 'advanced.keyboardShortcuts.close' },
+            { id: 'shortcut-minimize', key: 'advanced.keyboardShortcuts.minimize' },
+            { id: 'shortcut-maximize', key: 'advanced.keyboardShortcuts.maximize' },
+            { id: 'shortcut-show', key: 'advanced.keyboardShortcuts.show' },
+            { id: 'shortcut-hide', key: 'advanced.keyboardShortcuts.hide' }
+        ];
+
+        shortcuts.forEach(shortcut => {
+            const input = document.getElementById(shortcut.id);
+            if (input) {
+                // Load saved shortcut
+                const keys = shortcut.key.split('.');
+                let value = this.settings;
+                for (const k of keys) {
+                    value = value?.[k];
+                }
+                input.value = value || '';
+
+                // Add click handler to record new shortcut
+                input.addEventListener('click', () => {
+                    this.recordShortcut(input, shortcut.key);
+                });
+
+                // Prevent typing in the input
+                input.addEventListener('keydown', (e) => {
+                    e.preventDefault();
+                });
+            }
+        });
+    }
+
+    recordShortcut(input, settingKey) {
+        input.classList.add('recording');
+        input.value = 'Press keys...';
+        input.focus();
+
+        const recordedKeys = [];
+        
+        const keydownHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const key = e.key;
+            const modifiers = [];
+            
+            if (e.ctrlKey) modifiers.push('Ctrl');
+            if (e.altKey) modifiers.push('Alt');
+            if (e.shiftKey) modifiers.push('Shift');
+            if (e.metaKey) modifiers.push('Meta');
+
+            // Don't record modifier keys by themselves
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
+                return;
+            }
+
+            // Build shortcut string
+            const shortcutParts = [...modifiers];
+            
+            // Format special keys
+            let keyName = key;
+            if (key === ' ') keyName = 'Space';
+            else if (key === 'Escape') keyName = 'Esc';
+            else if (key.length === 1) keyName = key.toUpperCase();
+            
+            shortcutParts.push(keyName);
+            const shortcutString = shortcutParts.join('+');
+
+            // Update input and save
+            input.value = shortcutString;
+            input.classList.remove('recording');
+            
+            // Update pending settings
+            this.updatePendingSetting(settingKey, shortcutString);
+
+            // Remove event listeners
+            document.removeEventListener('keydown', keydownHandler, true);
+            document.removeEventListener('blur', blurHandler, true);
+        };
+
+        const blurHandler = () => {
+            input.classList.remove('recording');
+            // Restore original value if cancelled
+            const keys = settingKey.split('.');
+            let value = this.settings;
+            for (const k of keys) {
+                value = value?.[k];
+            }
+            input.value = value || '';
+            
+            document.removeEventListener('keydown', keydownHandler, true);
+            document.removeEventListener('blur', blurHandler, true);
+        };
+
+        // Use capture phase to catch all keydown events
+        document.addEventListener('keydown', keydownHandler, true);
+        input.addEventListener('blur', blurHandler, true);
+    }
+
     setupConfigActions() {
+        // Save settings button
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', async () => {
+                try {
+                    saveSettingsBtn.disabled = true;
+                    saveSettingsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    
+                    // Save all pending settings
+                    await this.saveAllPendingSettings();
+                    
+                    // Update global shortcuts if they were changed
+                    if (Object.keys(this.pendingSettings).some(key => key.startsWith('advanced.keyboardShortcuts'))) {
+                        await window.electronAPI.updateGlobalShortcuts();
+                    }
+                    
+                    this.showNotification('Settings saved successfully', 'primary');
+                } catch (error) {
+                    console.error('Error saving settings:', error);
+                    this.showNotification('Failed to save settings', 'error');
+                } finally {
+                    saveSettingsBtn.disabled = false;
+                    saveSettingsBtn.innerHTML = '<i class="fas fa-save"></i> Save Settings';
+                }
+            });
+        }
+
         // Restore defaults button
         const restoreDefaultsBtn = document.getElementById('restore-defaults-btn');
         if (restoreDefaultsBtn) {
@@ -464,13 +633,24 @@ class AppRenderer {
                     // Restore default settings
                     this.settings = await window.electronAPI.restoreDefaultSettings();
                     
+                    // Clear pending changes
+                    this.pendingSettings = {};
+                    this.hasUnsavedChanges = false;
+                    this.updateSaveButtonState();
+                    
                     // Update all UI elements with new settings
                     this.updateAllSettingsUI();
+                    this.setupAdvancedSettings();
                     
                     // Apply the new settings
                     this.applyFont(this.settings.appearance.fontFamily);
+                    this.applyFontSize(this.settings.appearance.fontSize);
                     this.applyButtonStyle(this.settings.appearance.titlebarButtonStyle);
                     this.applyAccentColor(this.settings.appearance.accentColor);
+                    
+                    // Re-setup selectors to update UI
+                    this.setupFontSelector();
+                    this.setupFontSizeSelector();
                     
                     this.showNotification('Settings restored to default', 'primary');
                 } catch (error) {
@@ -515,28 +695,36 @@ class AppRenderer {
         // Update font selector
         const fontSelect = document.getElementById('font-select');
         if (fontSelect) {
-            fontSelect.value = this.settings.appearance?.fontFamily || 'inconsolata';
+            const fontFamily = this.settings.appearance?.fontFamily || 'smooch-sans';
+            fontSelect.value = fontFamily;
+            this.applyFont(fontFamily);
+        }
+
+        // Update font size selector
+        const fontSizeSelect = document.getElementById('font-size-select');
+        if (fontSizeSelect) {
+            const fontSize = this.settings.appearance?.fontSize || 'medium';
+            fontSizeSelect.value = fontSize;
+            this.applyFontSize(fontSize);
         }
 
         // Update button style selector
         const buttonStyleSelect = document.getElementById('button-style-select');
         if (buttonStyleSelect) {
-            buttonStyleSelect.value = this.settings.appearance?.titlebarButtonStyle || 'square';
+            const buttonStyle = this.settings.appearance?.titlebarButtonStyle || 'round';
+            buttonStyleSelect.value = buttonStyle;
+            this.applyButtonStyle(buttonStyle);
         }
 
         // Update accent color selector
         const accentColorSelect = document.getElementById('accent-color-select');
         if (accentColorSelect) {
-            accentColorSelect.value = this.settings.appearance?.accentColor || '#28ca42';
+            const accentColor = this.settings.appearance?.accentColor || '#00a2ff';
+            accentColorSelect.value = accentColor;
+            this.applyAccentColor(accentColor);
         }
 
-        // Update window state selector
-        const windowStateSelect = document.getElementById('window-state-select');
-        if (windowStateSelect) {
-            windowStateSelect.value = this.settings.behavior?.defaultWindowState || 'normal';
-        }
-
-        // Update behavior checkboxes
+        // Update behavior settings
         const behaviorSettings = [
             { id: 'remember-window-size', key: 'rememberWindowSize' },
             { id: 'launch-on-startup', key: 'launchOnStartup' },
@@ -552,6 +740,49 @@ class AppRenderer {
                 checkbox.checked = this.settings.behavior?.[setting.key] || false;
             }
         });
+    }
+
+    updatePendingSetting(key, value) {
+        this.pendingSettings[key] = value;
+        this.hasUnsavedChanges = true;
+        this.updateSaveButtonState();
+    }
+
+    updateSaveButtonState() {
+        const saveBtn = document.getElementById('save-settings-btn');
+        if (saveBtn) {
+            if (this.hasUnsavedChanges) {
+                saveBtn.classList.add('has-changes');
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Settings *';
+            } else {
+                saveBtn.classList.remove('has-changes');
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Settings';
+            }
+        }
+    }
+
+    async saveAllPendingSettings() {
+        for (const [key, value] of Object.entries(this.pendingSettings)) {
+            await window.electronAPI.saveSetting(key, value);
+        }
+        
+        // Update local settings object
+        for (const [key, value] of Object.entries(this.pendingSettings)) {
+            const keys = key.split('.');
+            let current = this.settings;
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (!current[keys[i]]) {
+                    current[keys[i]] = {};
+                }
+                current = current[keys[i]];
+            }
+            current[keys[keys.length - 1]] = value;
+        }
+        
+        // Clear pending changes
+        this.pendingSettings = {};
+        this.hasUnsavedChanges = false;
+        this.updateSaveButtonState();
     }
 }
 

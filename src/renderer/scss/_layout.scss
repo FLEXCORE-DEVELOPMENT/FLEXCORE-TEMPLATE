@@ -6,22 +6,38 @@
   height: calc(100vh - #{$titlebar-height});
   overflow-y: auto;
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
   max-width: $container-max-width;
   margin: 0 auto;
   padding: $spacing-lg;
-  height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+}
+
+// Home page specific centering
+#home-page .container {
+  justify-content: center;
+}
+
+// Settings page specific top alignment
+#config-page .container {
+  justify-content: flex-start;
 }
 
 // Header Styles
 .app-header {
   text-align: center;
+  margin-bottom: $spacing-xl;
+}
+
+// Home page header adjustment for centering
+#home-page .app-header {
   margin-bottom: $spacing-xl;
 }
 
@@ -49,6 +65,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   width: 100%;
+  flex: 1;
+  padding-bottom: $spacing-xl;
+}
+
+// Home page content centering
+#home-page .content-area {
+  justify-content: center;
+  min-height: 0;
+}
+
+// Settings page content top alignment
+#config-page .content-area {
+  justify-content: flex-start;
 }

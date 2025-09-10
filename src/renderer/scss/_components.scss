@@ -1,5 +1,6 @@
 @use 'variables' as *;
 @use 'mixins' as *;
+@use 'sass:color';
 
 // Page System
 .page {
@@ -332,4 +333,93 @@
   &.notification-info {
     background: #0ea5e9;
   }
+}
+
+// Custom Scrollbar Styles
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $primary-bg;
+  border-radius: $border-radius-sm;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-color;
+  border-radius: $border-radius-sm;
+  transition: background $transition-fast;
+  
+  &:hover {
+    background: $accent-color;
+  }
+}
+
+::-webkit-scrollbar-corner {
+  background: $primary-bg;
+}
+
+// Firefox scrollbar styling
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $border-color $primary-bg;
+}
+
+// Keyboard Shortcuts Styling
+.shortcut-grid {
+  display: grid;
+  gap: $spacing-md;
+  margin-top: $spacing-sm;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  
+  label {
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    margin: 0;
+    min-width: 120px;
+  }
+}
+
+.shortcut-input {
+  flex: 1;
+  max-width: 200px;
+  padding: $spacing-sm $spacing-md;
+  background: $primary-bg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:focus {
+    outline: none;
+    border-color: $accent-color;
+    background: color.adjust($primary-bg, $lightness: 5%);
+  }
+  
+  &:hover {
+    border-color: $accent-color;
+  }
+  
+  &.recording {
+    border-color: $accent-color;
+    background: color.adjust($primary-bg, $lightness: 5%);
+    animation: pulse 1s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }

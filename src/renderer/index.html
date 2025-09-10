@@ -140,10 +140,18 @@
                                 </select>
                             </div>
                             <div class="config-item">
-                                <label>Font Family</label>
-                                <select class="config-select" id="font-select">
+                                <label for="font-select">Font Family:</label>
+                                <select id="font-select" class="config-select">
                                     <option value="smooch-sans">Smooch Sans</option>
                                     <option value="inconsolata">Inconsolata</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label for="font-size-select">Font Size:</label>
+                                <select id="font-size-select" class="config-select">
+                                    <option value="small">Small</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="large">Large</option>
                                 </select>
                             </div>
                             <div class="config-item">
@@ -218,13 +226,46 @@
                         </div>
 
                         <div class="config-section">
-                            <h3><i class="fas fa-tools"></i> Actions</h3>
+                            <h3><i class="fas fa-code"></i> Advanced</h3>
+                            <div class="config-item">
+                                <label>Keyboard Shortcuts</label>
+                                <div class="shortcut-grid">
+                                    <div class="shortcut-item">
+                                        <label for="shortcut-close">Close Window:</label>
+                                        <input type="text" id="shortcut-close" class="shortcut-input" placeholder="Ctrl+Q" readonly>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <label for="shortcut-minimize">Minimize Window:</label>
+                                        <input type="text" id="shortcut-minimize" class="shortcut-input" placeholder="Ctrl+M" readonly>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <label for="shortcut-maximize">Maximize Window:</label>
+                                        <input type="text" id="shortcut-maximize" class="shortcut-input" placeholder="Ctrl+Shift+M" readonly>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <label for="shortcut-show">Show Window:</label>
+                                        <input type="text" id="shortcut-show" class="shortcut-input" placeholder="Ctrl+Shift+S" readonly>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <label for="shortcut-hide">Hide Window:</label>
+                                        <input type="text" id="shortcut-hide" class="shortcut-input" placeholder="Ctrl+H" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="config-section">
+                            <h3><i class="fas fa-cogs"></i> Actions</h3>
                             <div class="config-actions">
+                                <button class="config-button config-button-primary" id="save-settings-btn">
+                                    <i class="fas fa-save"></i>
+                                    Save Settings
+                                </button>
                                 <button class="config-button config-button-secondary" id="restore-defaults-btn">
                                     <i class="fas fa-undo"></i>
                                     Restore to Default
                                 </button>
-                                <button class="config-button config-button-primary" id="export-settings-btn">
+                                <button class="config-button config-button-secondary" id="export-settings-btn">
                                     <i class="fas fa-download"></i>
                                     Export Settings
                                 </button>
@@ -239,7 +280,7 @@
             <div class="page hidden" id="about-page">
                 <header class="app-header">
                     <h1 class="app-title">
-                        <i class="fas fa-info-circle"></i> About FlexCore
+                        About FlexCore
                     </h1>
                     <p class="app-subtitle">Application Information</p>
                 </header>
